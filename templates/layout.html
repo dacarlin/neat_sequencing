@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- <link rel="icon" href="../../favicon.ico"> -->
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+
+    <!-- Neat CSS -->
+    <link rel="stylesheet" href="/static/style.css"/>
+
+    <!-- page title -->
+    <title>Neat Sequencing</title>
+
+    <!-- Custom styles for this template -->
+    <link href="narrow-jumbotron.css" rel="stylesheet">
+
+    <!-- Typefaces from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Fira+Sans" rel="stylesheet">
+  </head>
+
+  <body>
+
+    <div class="flashes">
+    {% with flashes = get_flashed_messages() %}
+      {% if flashes %}
+        <ul class="flashes">
+        {% for message in flashes %}
+          <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    </div>
+
+
+    <div class="container">
+      <div class="header clearfix">
+
+        {% if g.user %}
+          <!-- <a href="{{ url_for('timeline') }}">my timeline</a> |
+          <a href="{{ url_for('public_timeline') }}">public timeline</a> |
+          <a href="{{ url_for('logout') }}">sign out [{{ g.user.username }}]</a> -->
+          <nav>
+            <ul class="nav nav-pills float-right">
+              <li class="nav-item">
+                <a class="nav-link active muted" href="{{ url_for('logout') }}">sign out [{{ g.user.username }}]</a>
+              </li>
+            </ul>
+          </nav>
+        {% else %}
+        <nav>
+          <ul class="nav nav-pills float-right">
+            <li class="nav-item">
+              <a class="nav-link active" href="/login">Log in</a>
+            </li>
+          </ul>
+        </nav>
+          <!-- <a href="{{ url_for('public_timeline') }}">public timeline</a> |
+          <a href="{{ url_for('register') }}">sign up</a> |
+          <a href="{{ url_for('login') }}">sign in</a> -->
+        {% endif %}
+        <h3 class="text-muted">Neat Sequencing</h3>
+      </div>
+
+      <div class="body">
+      {% block body %}{% endblock %}
+      </div>
+
+      <footer class="footer">
+        <p>&copy; Neat Sequencing 2017</p>
+      </footer>
+
+    </div> <!-- /container -->
+
+    <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+  </body>
+</html>

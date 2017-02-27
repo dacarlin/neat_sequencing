@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- <link rel="icon" href="../../favicon.ico"> -->
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+
+    <!-- Neat CSS -->
+    <link rel="stylesheet" href="/static/style.css"/>
+
+    <!-- page title -->
+    <title>{% block title %}{% endblock %}</title>
+
+    <!-- Custom styles for this template -->
+    <link href="/static/dash.css" rel="stylesheet">
+
+    <!-- Typefaces from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Fira+Sans" rel="stylesheet">
+  </head>
+
+  <body>
+    <nav class="navbar navbar-toggleable-md navbar-inverse fixed-top bg-inverse">
+      <button class="navbar-toggler navbar-toggler-right hidden-lg-up" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <a class="navbar-brand" href="#">Neat Dashboard</a>
+
+      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+          <li></li>
+        </ul>
+        <form class="form-inline mt-2 mt-md-0">
+          <input class="form-control mr-sm-2" type="text" placeholder="Search">
+          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        </form>
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row">
+        <nav class="col-sm-3 col-md-2 hidden-xs-down bg-faded sidebar">
+
+          <ul class="nav nav-pills flex-column">
+            <li class="nav-item">
+              <span class="glyphicon glyphicon-align-left" aria-hidden="true"></span>
+              <span class="nav-link">
+
+              </span
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="#">Most recent order<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/orders">Order history</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/logout">Log out </a>
+            </li>
+          </ul>
+        </nav>
+
+        <main class="col-sm-9 offset-sm-3 col-md-10 offset-md-2 pt-3">
+              <div class="place_order">
+
+                <h4>Place an order</h4>
+
+                <form class="form-inline" action="{{ url_for('add_message') }}" method="post">
+
+                  <div class="input-group">
+                    <div class="input-group-addon">First barcode</div>
+                    <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" size=6 id="text" name="text" placeholder="000000">
+                  </div>
+
+                  <div class="input-group">
+                    <div class="input-group-addon">384-well plates</div>
+                    <input type="text" class="form-control" id="n_plates" len=2 name="n_plates" placeholder="1" />
+                  </div>
+
+                  <!-- <label class="mr-sm-2" for="inlineFormCustomSelect">Preference</label> -->
+
+                  <select class="custom-select">
+                    <option selected>Choose forward:</option>
+                    <option value="1">T7</option>
+                    <option value="2">Other</option>
+
+                  </select>
+
+
+                  <!-- <label class="mr-sm-2" for="inlineFormCustomSelect">Preference</label> -->
+                  <select class="custom-select">
+                    <option selected>Choose reverse:</option>
+                    <option value="0">T7term</option>
+                    <option value="1">OtherTerm</option>
+
+                  </select>
+
+                  <!-- <div class="form-check mb-2 mr-sm-2 mb-sm-0">
+                    <label class="form-check-label">
+                      <input class="form-check-input" type="checkbox" id="ship_new" name="ship_new"> Ship new plates
+                    </label>
+                  </div> -->
+
+                  <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+              </div>
+
+          <h2>Recent orders for {{ g.user.username }}</h2>
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Order by</th>
+                  <th>First barcode</th>
+                  <th>Primer set (fwd/rev)</th>
+                  <th>FASTQ file count</th>
+                  <th>Notes on read quality</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for message in messages %}
+                  <tr>
+                    <td>
+                      <strong><a href="{{ url_for('user_timeline', username=message.username)}}">{{ message.username }}</a></strong>
+                    </td>
+                    <td>
+                      {{ message.text }}
+                    </td>
+                    <td>
+                      <small>&mdash; {{ message.pub_date|datetimeformat }}</small>
+                    </td>
+                    <td>11</td>
+                    <td>00</td>
+                {% else %}
+                  <tr><td><em>There are no orders so far.</em></td></tr>
+                {% endfor %}
+
+                <tr>
+                  <td>1,015</td>
+                  <td>sodales</td>
+                  <td>ligula</td>
+                  <td>in</td>
+                  <td>libero</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+  </body>
+</html>
