@@ -1,27 +1,18 @@
 # -*- coding: utf-8 -*-
-
-# Neat Sequencing web app
-# based on example from https://github.com/pallets/flask
-
-import time
 from sqlite3 import dbapi2 as sqlite3
-from hashlib import md5
 from datetime import datetime
-from flask import Flask, request, session, url_for, redirect, \
-     render_template, abort, g, flash, _app_ctx_stack
+from flask import Flask, request, session, url_for, redirect, render_template, abort, g, flash, _app_ctx_stack
 from werkzeug import check_password_hash, generate_password_hash
+from io import StringIO, BytesIO
+import pandas
 
-# configuration
 DATABASE = '/tmp/neat.db'
-PER_PAGE = 30
+PER_PAGE = 1000
 DEBUG = True
-SECRET_KEY = 'development key'
+SECRET_KEY = 'secret key!'
 
-# create our little application :)
-app = Flask(__name__)
-app.config.from_object(__name__)
-# app.config.from_envvar( 'NEAT_SETTINGS', silent=True )
-
+app = Flask( __name__ )
+app.config.from_object( __name__ )
 
 def get_db():
     """Opens a new database connection if there is none yet for the
@@ -33,14 +24,12 @@ def get_db():
         top.sqlite_db.row_factory = sqlite3.Row
     return top.sqlite_db
 
-
 @app.teardown_appcontext
 def close_database(exception):
     """Closes the database again at the end of the request."""
     top = _app_ctx_stack.top
     if hasattr(top, 'sqlite_db'):
         top.sqlite_db.close()
-
 
 def init_db():
     """Initializes the database."""
@@ -49,13 +38,11 @@ def init_db():
         db.cursor().executescript(f.read())
     db.commit()
 
-
 @app.cli.command('initdb')
 def initdb_command():
     """Creates the database tables."""
     init_db()
     print('Initialized the database.')
-
 
 def query_db(query, args=(), one=False):
     """Queries the database and returns a list of dictionaries."""
@@ -63,128 +50,22 @@ def query_db(query, args=(), one=False):
     rv = cur.fetchall()
     return (rv[0] if rv else None) if one else rv
 
-
 def get_user_id(username):
     """Convenience method to look up the id for a username."""
-    rv = query_db('select user_id from user where username = ?',
-                  [username], one=True)
+    rv = query_db('select user_id from user where username = ?', [username], one=True)
     return rv[0] if rv else None
-
 
 def format_datetime(timestamp):
     """Format a timestamp for display."""
-    return datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d @ %H:%M')
-
-
-def gravatar_url(email, size=80):
-    """Return the gravatar image for the given email address."""
-    return 'https://www.gravatar.com/avatar/%s?d=identicon&s=%d' % \
-        (md5(email.strip().lower().encode('utf-8')).hexdigest(), size)
-
+    return datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d at %H:%M')
 
 @app.before_request
 def before_request():
     g.user = None
     if 'user_id' in session:
-        g.user = query_db('select * from user where user_id = ?',
-                          [session['user_id']], one=True)
+        g.user = query_db('select * from user where user_id = ?', [session['user_id']], one=True)
 
-
-@app.route('/')
-def timeline():
-    """Shows a users timeline or if no user is logged in it will
-    redirect to the public timeline.  This timeline shows the user's
-    messages as well as all the messages of followed users.
-    """
-    if not g.user:
-        return render_template( 'hero.html' )
-    return render_template('dash.html', messages=query_db('''
-        select message.*, user.* from message, user
-        where message.author_id = user.user_id and (
-            user.user_id = ? or
-            user.user_id in (select whom_id from follower
-                                    where who_id = ?))
-        order by message.pub_date desc limit ?''',
-        [session['user_id'], session['user_id'], PER_PAGE]))
-
-
-
-@app.route('/public')
-def public_timeline():
-    """Displays the orders of all users."""
-    return render_template('timeline.html', messages=query_db('''
-        select message.*, user.* from message, user
-        where message.author_id = user.user_id
-        order by message.pub_date desc limit ?''', [PER_PAGE]))
-
-
-@app.route('/<username>')
-def user_timeline(username):
-    """Display's a users tweets."""
-    profile_user = query_db('select * from user where username = ?',
-                            [username], one=True)
-    if profile_user is None:
-        abort(404)
-    followed = False
-    if g.user:
-        followed = query_db('''select 1 from follower where
-            follower.who_id = ? and follower.whom_id = ?''',
-            [session['user_id'], profile_user['user_id']],
-            one=True) is not None
-    return render_template('timeline.html', messages=query_db('''
-            select message.*, user.* from message, user where
-            user.user_id = message.author_id and user.user_id = ?
-            order by message.pub_date desc limit ?''',
-            [profile_user['user_id'], PER_PAGE]), followed=followed,
-            profile_user=profile_user)
-
-
-@app.route('/<username>/follow')
-def follow_user(username):
-    """Adds the current user as follower of the given user."""
-    if not g.user:
-        abort(401)
-    whom_id = get_user_id(username)
-    if whom_id is None:
-        abort(404)
-    db = get_db()
-    db.execute('insert into follower (who_id, whom_id) values (?, ?)',
-              [session['user_id'], whom_id])
-    db.commit()
-    flash('You are now following "%s"' % username)
-    return redirect(url_for('user_timeline', username=username))
-
-
-@app.route('/<username>/unfollow')
-def unfollow_user(username):
-    """Removes the current user as follower of the given user."""
-    if not g.user:
-        abort(401)
-    whom_id = get_user_id(username)
-    if whom_id is None:
-        abort(404)
-    db = get_db()
-    db.execute('delete from follower where who_id=? and whom_id=?',
-              [session['user_id'], whom_id])
-    db.commit()
-    flash('You are no longer following "%s"' % username)
-    return redirect(url_for('user_timeline', username=username))
-
-
-@app.route('/add_message', methods=['POST'])
-def add_message():
-    """Registers a new message for the user."""
-    if 'user_id' not in session:
-        abort(401)
-    if request.form['text']:
-        db = get_db()
-        db.execute('''insert into message (author_id, text, pub_date)
-          values (?, ?, ?)''', (session['user_id'], request.form['text'],
-                                int(time.time())))
-        db.commit()
-        flash('Your message was recorded')
-    return redirect(url_for('timeline'))
-
+###### login/logout of users and registering
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -205,7 +86,6 @@ def login():
             session['user_id'] = user['user_id']
             return redirect(url_for('timeline'))
     return render_template('login.html', error=error)
-
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -236,7 +116,6 @@ def register():
             return redirect( url_for( 'login' ) )
     return render_template('register.html', error=error)
 
-
 @app.route('/logout')
 def logout():
     """Logs the user out."""
@@ -244,7 +123,69 @@ def logout():
     session.pop('user_id', None)
     return redirect( '/' )
 
+################# dashbaord, ordering plates, orderig sequeinc g
+
+@app.route('/')
+def timeline():
+    '''Renders the user dashboard (if no user is logged in, displays marketing page!)'''
+    if not g.user:
+        return render_template( 'hero.html' )
+
+    plates = query_db('''select * from plate where owner = ?''', (g.user['user_id'],) )
+    sequencing = query_db('''select * from sequencing where owner = ?''', (g.user['user_id'],) )
+
+    return render_template('dash.html', plates=plates, sequencing=sequencing)
+
+@app.route('/add_message', methods=['POST'])
+def add_message():
+    """Registers a new order for the user."""
+    if 'user_id' not in session:
+        abort(401)
+
+    db = get_db()
+    db.execute('''insert into plate(owner) values (?)''', (g.user['user_id'],))
+    db.commit()
+    flash( 'Plate was registered' )
+    return redirect( url_for('timeline') )
+
+@app.route('/order_sequencing', methods=['POST'])
+def order_sequencing():
+    """The user places an order for sequencing"""
+    if 'user_id' not in session:
+        abort(401)
+
+    print( 'File keys:', list( request.files.keys() ) )
+
+    if 'file' not in request.files:
+        flash( 'No file part' )
+        return redirect( '/' )
+    file_handle = request.files['file']
+    if file_handle.filename == '':
+        flash( 'No file selected' )
+        return redirect( '/' )
+    if file_handle:
+        bytes_io = BytesIO( request.files['file'].read() )
+        byte_str = bytes_io.read()
+        text_obj = byte_str.decode('UTF-8')  # Or use the encoding you expect
+        str_obj = StringIO(text_obj)
+        df = pandas.read_csv( str_obj, index_col=0 )
+
+    db = get_db()
+    db.execute('''insert into sequencing(owner) values (?)''', (g.user['user_id'],))
+    db.commit()
+    flash( 'Plate was registered' )
+    return redirect( url_for( 'timeline' ) )
 
 # add some filters to jinja
 app.jinja_env.filters['datetimeformat'] = format_datetime
-app.jinja_env.filters['gravatar'] = gravatar_url
+
+#################### admin and process
+
+@app.route('/orders')
+def orders():
+    plates = query_db('select * from plate')
+    sequencing = query_db('select * from sequencing')
+    print( plates )
+    print( dir( plates[0] ) )
+    print( list( plates[0].keys() ) )
+    return render_template( 'orders.html', plates=plates, sequencing=sequencing )

@@ -6,16 +6,16 @@ create table user (
   pw_hash text not null
 );
 
-drop table if exists follower;
-create table follower (
-  who_id integer,
-  whom_id integer
+drop table if exists plate;
+create table plate (
+  plate_id integer primary key autoincrement,
+  owner integer,
+  foreign key (owner) references user(user_id)
 );
 
-drop table if exists message;
-create table message (
-  message_id integer primary key autoincrement,
-  author_id integer not null,
-  text text not null,
-  pub_date integer
+drop table if exists sequencing;
+create table sequencing (
+  sequencing_id integer primary key autoincrement,
+  owner integer,
+  foreign key (owner) references user(user_id)
 );

@@ -1,161 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <title>Neat Dashboard</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
-    <!-- <link rel="icon" href="../../favicon.ico"> -->
-
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
-
-    <!-- Neat CSS -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Sans"/>
     <link rel="stylesheet" href="/static/style.css"/>
-
-    <!-- page title -->
-    <title>{% block title %}{% endblock %}</title>
-
-    <!-- Custom styles for this template -->
-    <link href="/static/dash.css" rel="stylesheet">
-
-    <!-- Typefaces from Google Fonts -->
-    <link href="https://fonts.googleapis.com/css?family=Fira+Sans" rel="stylesheet">
   </head>
-
   <body>
-    <nav class="navbar navbar-toggleable-md navbar-inverse fixed-top bg-inverse">
-      <button class="navbar-toggler navbar-toggler-right hidden-lg-up" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+    <nav class="navbar navbar-light bg-faded">
       <a class="navbar-brand" href="#">Neat Dashboard</a>
-
-      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-        <ul class="navbar-nav mr-auto">
-          <li></li>
-        </ul>
-        <form class="form-inline mt-2 mt-md-0">
-          <input class="form-control mr-sm-2" type="text" placeholder="Search">
-          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-        </form>
-      </div>
     </nav>
-
     <div class="container-fluid">
       <div class="row">
-        <nav class="col-sm-3 col-md-2 hidden-xs-down bg-faded sidebar">
-
-          <ul class="nav nav-pills flex-column">
-            <li class="nav-item">
-              <span class="glyphicon glyphicon-align-left" aria-hidden="true"></span>
-              <span class="nav-link">
-
-              </span
-            </li>
-            <li class="nav-item">
-              <a class="nav-link active" href="#">Most recent order<span class="sr-only">(current)</span></a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/orders">Order history</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/logout">Log out </a>
-            </li>
-          </ul>
-        </nav>
-
-        <main class="col-sm-9 offset-sm-3 col-md-10 offset-md-2 pt-3">
-              <div class="place_order">
-
-                <h4>Place an order</h4>
-
-                <form class="form-inline" action="{{ url_for('add_message') }}" method="post">
-
-                  <div class="input-group">
-                    <div class="input-group-addon">First barcode</div>
-                    <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" size=6 id="text" name="text" placeholder="000000">
-                  </div>
-
-                  <div class="input-group">
-                    <div class="input-group-addon">384-well plates</div>
-                    <input type="text" class="form-control" id="n_plates" len=2 name="n_plates" placeholder="1" />
-                  </div>
-
-                  <!-- <label class="mr-sm-2" for="inlineFormCustomSelect">Preference</label> -->
-
-                  <select class="custom-select">
-                    <option selected>Choose forward:</option>
-                    <option value="1">T7</option>
-                    <option value="2">Other</option>
-
-                  </select>
-
-
-                  <!-- <label class="mr-sm-2" for="inlineFormCustomSelect">Preference</label> -->
-                  <select class="custom-select">
-                    <option selected>Choose reverse:</option>
-                    <option value="0">T7term</option>
-                    <option value="1">OtherTerm</option>
-
-                  </select>
-
-                  <!-- <div class="form-check mb-2 mr-sm-2 mb-sm-0">
-                    <label class="form-check-label">
-                      <input class="form-check-input" type="checkbox" id="ship_new" name="ship_new"> Ship new plates
-                    </label>
-                  </div> -->
-
-                  <button type="submit" class="btn btn-primary">Submit</button>
-                </form>
+        <div class="col-4">
+          <div class="place_order">
+            <h4>Order plates</h4>
+            <form class="" action="{{ url_for('add_message') }}" method="post">
+              <div class="form-group">
+                <label for="plate_number_select">How many plates?</label>
+                <select class="form-control" id="plate_number_select">
+                  {% for i in range( 1, 11 ) %}
+                  <option>{{i}}</option>
+                  {% endfor %}
+                </select>
+                <small class="form-text text-muted">You can order sequencing before your plates arrive</small>
               </div>
-
-          <h2>Recent orders for {{ g.user.username }}</h2>
-          <div class="table-responsive">
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th>Order by</th>
-                  <th>First barcode</th>
-                  <th>Primer set (fwd/rev)</th>
-                  <th>FASTQ file count</th>
-                  <th>Notes on read quality</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for message in messages %}
-                  <tr>
-                    <td>
-                      <strong><a href="{{ url_for('user_timeline', username=message.username)}}">{{ message.username }}</a></strong>
-                    </td>
-                    <td>
-                      {{ message.text }}
-                    </td>
-                    <td>
-                      <small>&mdash; {{ message.pub_date|datetimeformat }}</small>
-                    </td>
-                    <td>11</td>
-                    <td>00</td>
-                {% else %}
-                  <tr><td><em>There are no orders so far.</em></td></tr>
-                {% endfor %}
-
-                <tr>
-                  <td>1,015</td>
-                  <td>sodales</td>
-                  <td>ligula</td>
-                  <td>in</td>
-                  <td>libero</td>
-                </tr>
-              </tbody>
-            </table>
+              <div class="form-group">
+               <label for="plate_reference">Include a reference</label>
+               <input type="text" class="form-control" id="plate_reference" placeholder="My order name">
+               <small class="form-text text-muted">The reference is just for your records. It can be up to 100 characters. </small>
+             </div>
+             <button type="submit" class="btn btn-success">Submit</button>
+            </form>
           </div>
-        </main>
+          <div class="place_order">
+            <h4>Order sequencing</h4>
+            <form class="" action="{{ url_for('order_sequencing') }}" method="post" enctype="multipart/form-data">
+              <div class="form-group">
+                <label for="plate_id">Select from your plates</label>
+                <select class="form-control" id="plate_id">
+                  {% for pt in plates %}
+                  <option>Plate ID: {{ pt.plate_id }}</option>
+                  {% endfor %}
+                </select>
+                <small class="form-text text-muted">You can order sequencing before your plates arrive</small>
+              </div>
+              <div class="form-group">
+                <label for="plate_id">Upload a sample map</label>
+                <small class="form-text text-muted">Download templates in <a href="">plain text</a> and <a href="">Excel</a> file formats to map each well to a sample name for when the sequence is reported.</small>
+              </div>
+              <div class="form-group">
+                <div class="btn-group">
+                  <label class="btn btn-primary" for="file_selector">
+                      <input id="file_selector" name="file" type="file" style="display:none;" onchange="$('#upload-file-info').html($(this).val());">
+                      Choose file …
+                  </label>
+                  <label class="btn btn-secondary" id="upload-file-info"></label>
+                </div>
+              </div>
+              <div class="form-group">
+               <label for="exampleInputEmail1">Include a reference</label>
+               <input type="email" class="form-control" id="seq_order_reference" placeholder="My order name">
+               <small class="form-text text-muted">The reference is just for your records. It can be up to 100 characters. </small>
+             </div>
+             <button type="submit" class="btn btn-success">Submit</button>
+            </form>
+          </div>
+        </div>
+        <div class="col-8">
+          <div class="place_order">
+            <h4>My sequencing</h4>
+            <ul>
+            {% for seq in sequencing %}
+              <li>Sequencing ID: {{ seq.sequencing_id }}</li>
+            {% else %}
+              <li>No sequencing yet!</li>
+            {% endfor %}
+            </ul>
+          </div>
+          <div class="place_order">
+            <h4>Current inventory of plates</h4>
+            <ul>
+            {% for plate in plates %}
+              <li>Plate ID: {{ plate.plate_id }}</li>
+            {% else %}
+              <li>No plates in your inventory</li>
+            {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <p>Logged in as <a href="">{{g.user.username}}</a> | <a href="/logout">Log out</a> </p>
       </div>
     </div>
-
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
   </body>

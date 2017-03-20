@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block body %}
+<table>
+  <thead>
+    <tr>
+      <th>Order ID</th>
+      <th>User ID</th>
+      <th>Barcode</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in results %}
+    <tr>
+      <td>{{ r['message_id'] }}</td>
+      <td>{{ r['author_id'] }}</td>
+      <td>{{ r['text'] }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
