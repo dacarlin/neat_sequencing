@@ -22,7 +22,7 @@
             <form class="" action="{{ url_for('add_message') }}" method="post">
               <div class="form-group">
                 <label for="plate_number_select">How many plates?</label>
-                <select class="form-control" id="plate_number_select">
+                <select class="form-control" id="plate_number_select" name="plate_number_select">
                   {% for i in range( 1, 11 ) %}
                   <option>{{i}}</option>
                   {% endfor %}
@@ -31,7 +31,7 @@
               </div>
               <div class="form-group">
                <label for="plate_reference">Include a reference</label>
-               <input type="text" class="form-control" id="plate_reference" placeholder="My order name">
+               <input type="text" class="form-control" id="plate_reference" name="plate_reference" placeholder="My order name">
                <small class="form-text text-muted">The reference is just for your records. It can be up to 100 characters. </small>
              </div>
              <button type="submit" class="btn btn-success">Submit</button>

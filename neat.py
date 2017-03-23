@@ -138,14 +138,17 @@ def timeline():
 
 @app.route('/add_message', methods=['POST'])
 def add_message():
-    """Registers a new order for the user."""
+    """Requests a set of plates for this user"""
+
     if 'user_id' not in session:
         abort(401)
 
     db = get_db()
-    db.execute('''insert into plate(owner) values (?)''', (g.user['user_id'],))
-    db.commit()
-    flash( 'Plate was registered' )
+    plates_requested = int( request.form[ 'plate_number_select' ] )
+    for pt in range( plates_requested ):
+        db.execute('''insert into plate(owner) values (?)''', (g.user['user_id'],))
+        db.commit()
+    flash( 'Order was registered' )
     return redirect( url_for('timeline') )
 
 @app.route('/order_sequencing', methods=['POST'])
