@@ -6,7 +6,7 @@ from werkzeug import check_password_hash, generate_password_hash
 from io import StringIO, BytesIO
 import pandas
 
-DATABASE = '/tmp/neat.db'
+DATABASE = 'neat.db'
 PER_PAGE = 1000
 DEBUG = True
 SECRET_KEY = 'secret key!'
@@ -167,14 +167,13 @@ def order_sequencing():
         flash( 'No file selected' )
         return redirect( '/' )
     if file_handle:
-        bytes_io = BytesIO( request.files['file'].read() )
-        byte_str = bytes_io.read()
-        text_obj = byte_str.decode('UTF-8')  # Or use the encoding you expect
-        str_obj = StringIO(text_obj)
-        df = pandas.read_csv( str_obj, index_col=0 )
+        f_str = request.files[ 'file'].read().decode( 'utf-8' )
+        df = pandas.read_csv( StringIO(f_str), index_col=0 )
+
+    n_samples = len( df )
 
     db = get_db()
-    db.execute('''insert into sequencing(owner) values (?)''', (g.user['user_id'],))
+    db.execute('''insert into sequencing(owner, plate_map) values (?,?)''', (g.user['user_id'],df.to_string()))
     db.commit()
     flash( 'Plate was registered' )
     return redirect( url_for( 'timeline' ) )

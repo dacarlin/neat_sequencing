@@ -74,15 +74,30 @@
         <div class="col-8">
           <div class="place_order">
             <h4>My sequencing</h4>
-            <ul>
             {% for seq in sequencing %}
-              <li>Sequencing ID: {{ seq.sequencing_id }}</li>
+              <div class="row seq_order">
+                <div class="col-3">
+                  <small><strong>Reference</strong></small><br>
+                  {{ seq.plate_map[300:310] }}
+                </div>
+                <div class="col-3">
+                  <small><strong>Order number</strong></small><br>
+                  {{ seq.sequencing_id }}
+                </div>
+                <div class="col-3">
+                  <small><strong>Order status</strong></small><br>
+                  Order received
+                </div>
+                <div class="col-3">
+                  <small><strong>Results</strong></small><br>
+                  <a href="">AWS link</a>
+                </div>
+              </div>
             {% else %}
-              <li>No sequencing yet!</li>
+              <div><p class="no_yet">No sequencing yet!</p></div>
             {% endfor %}
-            </ul>
           </div>
-          <div class="place_order">
+          <!-- <div class="place_order">
             <h4>Current inventory of plates</h4>
             <ul>
             {% for plate in plates %}
@@ -91,7 +106,7 @@
               <li>No plates in your inventory</li>
             {% endfor %}
             </ul>
-          </div>
+          </div> -->
         </div>
       </div>
       <div class="footer">

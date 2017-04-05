@@ -1,24 +1,47 @@
+/* flashes */
+
 .flashes {
   position: absolute;
   top: 20px;
   right: 20px;
   width: 300px;
   height: 400px;
-  /*background: rgba( 255, 0, 0, 0.2 );*/
 }
+
+/* sequencing dashboard */
 
 .place_order {
-  padding: 1rem;
-  border: 1px dotted #aaa;
-  border-radius: 6px;
-  margin-top: 1rem;
+  /*padding: 1rem;*/
+  /*border: 0.5px solid rgba(97, 64, 81, 0.1);*/
+  /*border-radius: 6px;*/
+  /*margin: 1rem;*/
 }
 
-.active {
-  background-color: rgba( 25,  7, 63,1);
+.col-4 {
+  border-right: 1px solid #e5e5e5;
+  padding-top: 1rem;
 }
+
+.col-8 {
+  padding-top: 1rem;
+}
+
+.navbar {
+
+}
+
+/*h3, h4 {
+  color: rgba(97, 64, 81, 1);
+}*/
+
+/*.seq_order {
+  border-top: 0.5px solid rgba(97, 64, 81, 0.1);
+  padding: 0;
+  margin: 0;
+}*/
 
 /* Space out content a bit */
+
 body {
   /*padding-top: 1.5rem;*/
   padding-bottom: 1.5rem;
@@ -33,16 +56,6 @@ body {
   padding-left: 1rem;
 }
 
-/* Custom page header */
-.header {
-  padding-bottom: 2rem;
-}
-/* Make the masthead heading the same height as the navigation */
-.header h3 {
-  margin-top: 0;
-  margin-bottom: 0;
-  line-height: 3rem;
-}
 
 /* Custom page footer */
 .footer {
@@ -51,16 +64,6 @@ body {
   color: #777;
   border-top: .05rem solid #e5e5e5;
   text-align: center;
-}
-
-/* Customize container */
-@media (min-width: 48em) {
-  .container {
-    max-width: 46rem;
-  }
-}
-.container-narrow > hr {
-  margin: 2rem 0;
 }
 
 /* Main marketing message and sign up button */

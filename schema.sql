@@ -17,5 +17,6 @@ drop table if exists sequencing;
 create table sequencing (
   sequencing_id integer primary key autoincrement,
   owner integer,
+  plate_map text not null, -- pandas df 
   foreign key (owner) references user(user_id)
 );
