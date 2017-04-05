@@ -21,20 +21,16 @@
             <h4>Order plates</h4>
             <form class="" action="{{ url_for('add_message') }}" method="post">
               <div class="form-group">
-                <label for="plate_number_select">How many plates?</label>
+                <label for="plate_number_select">Select number of plates</label>
                 <select class="form-control" id="plate_number_select" name="plate_number_select">
-                  {% for i in range( 1, 11 ) %}
-                  <option>{{i}}</option>
+                  <option>1 plate, 384 well + seal</option>
+                  {% for i in range( 2, 11 ) %}
+                  <option>{{i}} plates, 384 well + seals</option>
                   {% endfor %}
                 </select>
-                <small class="form-text text-muted">You can order sequencing before your plates arrive</small>
+                <small class="form-text text-muted">Plates arrive in 2-3 business days. Plates are immediately available in your account.</small>
               </div>
-              <div class="form-group">
-               <label for="plate_reference">Include a reference</label>
-               <input type="text" class="form-control" id="plate_reference" name="plate_reference" placeholder="My order name">
-               <small class="form-text text-muted">The reference is just for your records. It can be up to 100 characters. </small>
-             </div>
-             <button type="submit" class="btn btn-success">Submit</button>
+             <button type="submit" class="btn btn-success">Add to my account</button>
             </form>
           </div>
           <div class="place_order">
@@ -47,7 +43,7 @@
                   <option>Plate ID: {{ pt.plate_id }}</option>
                   {% endfor %}
                 </select>
-                <small class="form-text text-muted">You can order sequencing before your plates arrive</small>
+                <!-- <small class="form-text text-muted">You can order sequencing before your plates arrive</small> -->
               </div>
               <div class="form-group">
                 <label for="plate_id">Upload a sample map</label>
@@ -63,9 +59,9 @@
                 </div>
               </div>
               <div class="form-group">
-               <label for="exampleInputEmail1">Include a reference</label>
-               <input type="email" class="form-control" id="seq_order_reference" placeholder="My order name">
-               <small class="form-text text-muted">The reference is just for your records. It can be up to 100 characters. </small>
+               <label for="reference_text">Include a reference</label>
+               <input type="email" class="form-control" id="reference_text" name="reference_text" placeholder="My order name">
+               <small class="form-text text-muted">The reference is just for your records</small>
              </div>
              <button type="submit" class="btn btn-success">Submit</button>
             </form>
@@ -78,7 +74,7 @@
               <div class="row seq_order">
                 <div class="col-3">
                   <small><strong>Reference</strong></small><br>
-                  {{ seq.plate_map[300:310] }}
+                  {{ seq.reference_text }}
                 </div>
                 <div class="col-3">
                   <small><strong>Order number</strong></small><br>

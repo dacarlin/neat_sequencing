@@ -71,7 +71,7 @@ def before_request():
 def login():
     """Logs the user in."""
     if g.user:
-        return redirect(url_for('timeline'))
+        return redirect(url_for('index'))
     error = None
     if request.method == 'POST':
         user = query_db('''select * from user where
@@ -84,14 +84,14 @@ def login():
         else:
             flash('You were logged in')
             session['user_id'] = user['user_id']
-            return redirect(url_for('timeline'))
+            return redirect(url_for('index'))
     return render_template('login.html', error=error)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     """Registers the user."""
     if g.user:
-        return redirect(url_for('timeline'))
+        return redirect(url_for('index'))
     error = None
     if request.method == 'POST':
         # if not request.form['username']:
@@ -126,30 +126,32 @@ def logout():
 ################# dashbaord, ordering plates, orderig sequeinc g
 
 @app.route('/')
-def timeline():
-    '''Renders the user dashboard (if no user is logged in, displays marketing page!)'''
+def index():
+
+    # if no user, display home page
     if not g.user:
         return render_template( 'hero.html' )
 
+    # if there is a user, then display dashboard
     plates = query_db('''select * from plate where owner = ?''', (g.user['user_id'],) )
     sequencing = query_db('''select * from sequencing where owner = ?''', (g.user['user_id'],) )
-
     return render_template('dash.html', plates=plates, sequencing=sequencing)
 
 @app.route('/add_message', methods=['POST'])
 def add_message():
-    """Requests a set of plates for this user"""
 
+    # abort if no user
     if 'user_id' not in session:
         abort(401)
 
+    # # adds a set of plates to the user
     db = get_db()
-    plates_requested = int( request.form[ 'plate_number_select' ] )
+    plates_requested = int( request.form[ 'plate_number_select' ].split()[0] )
     for pt in range( plates_requested ):
         db.execute('''insert into plate(owner) values (?)''', (g.user['user_id'],))
         db.commit()
     flash( 'Order was registered' )
-    return redirect( url_for('timeline') )
+    return redirect( url_for('index') )
 
 @app.route('/order_sequencing', methods=['POST'])
 def order_sequencing():
@@ -176,7 +178,7 @@ def order_sequencing():
     db.execute('''insert into sequencing(owner, plate_map) values (?,?)''', (g.user['user_id'],df.to_string()))
     db.commit()
     flash( 'Plate was registered' )
-    return redirect( url_for( 'timeline' ) )
+    return redirect( url_for( 'index' ) )
 
 # add some filters to jinja
 app.jinja_env.filters['datetimeformat'] = format_datetime
