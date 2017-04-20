@@ -1,9 +1,10 @@
 drop table if exists user;
 create table user (
   user_id integer primary key autoincrement,
-  username text not null,
+  user_name text not null,
   email text not null,
-  pw_hash text not null
+  pw_hash text not null, 
+  admin boolean
 );
 
 drop table if exists plate;

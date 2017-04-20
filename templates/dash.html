@@ -74,35 +74,50 @@
               <div class="row seq_order">
                 <div class="col-3">
                   <small><strong>Reference</strong></small><br>
-                  {{ seq.reference_text }}
+                  <a href="">Neat Order</a>{{ seq.reference_text }}
                 </div>
                 <div class="col-3">
-                  <small><strong>Order number</strong></small><br>
-                  {{ seq.sequencing_id }}
+                  <small><strong>Order Number</strong></small><br>
+                  Neat Order {{ seq.sequencing_id }}
                 </div>
                 <div class="col-3">
-                  <small><strong>Order status</strong></small><br>
-                  Order received
+                  <small><strong>Order Status</strong></small><br>
+                  ●<span style="color:#aaa">●●●</span> Order placed
                 </div>
                 <div class="col-3">
                   <small><strong>Results</strong></small><br>
                   <a href="">AWS link</a>
                 </div>
               </div>
+              <hr>
             {% else %}
               <div><p class="no_yet">No sequencing yet!</p></div>
             {% endfor %}
           </div>
-          <!-- <div class="place_order">
+          <div class="place_order">
             <h4>Current inventory of plates</h4>
-            <ul>
+            <div class="row">
             {% for plate in plates %}
-              <li>Plate ID: {{ plate.plate_id }}</li>
+              <div class="col-4">
+                <small><strong>Plate ID</strong></small><br>
+                Neat Plate {{ plate.plate_id }}
+              </div>
+              <div class="col-4">
+                <small>Plate Status</small><br>
+                ●<span style="color:#aaa">●●●</span> Order placed
+              </div>
+              <div class="col-4">
+                <small>Support</small><br>
+                <a href="">Report an issue</a>
+              </div>
+              <hr>
             {% else %}
-              <li>No plates in your inventory</li>
+            <div class="col-12">
+              <p class="none_yet">No plates yet!<br><small class="muted"><strong>&larr;</strong> Place an order in the sidebar</p>
+            </div>
             {% endfor %}
-            </ul>
-          </div> -->
+          </div> <!-- closes row -->
+          </div>
         </div>
       </div>
       <div class="footer">

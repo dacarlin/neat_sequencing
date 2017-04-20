@@ -1,10 +1,17 @@
 {% extends 'layout.html' %}
 {% block body %}
 
-<div class="jumbotron">
-  <h1>Targeted sequencing</h1>
+<div class="hero">
+  <h1>Targeted DNA Sequencing</h1>
   <p class="lead">Use free standard Sanger sequencing primers to <strong>sequence plasmid DNA</strong> and <strong>bacterial colonies</strong> with read lengths of up to <strong>10 kb</strong></p>
-  <p><a class="btn btn-lg btn-success" href="/register" role="button">Sign up today</a></p>
+  <p class="lead">
+    &mdash; Free standard Sanger primers <br>
+    &mdash; Read lengths up to 5kb <br>
+    &mdash; Plasmid or bacterial samples <br>
+    &mdash; Prices as low as <strong>$0.20 per sample</strong>
+  </p>
+  <p><a class="btn btn-lg btn-secondary" href="{{ url_for( 'sign_up' ) }}" role="button">Sign up today</a></p>
+  <p><small><a href="{{ url_for( 'sign_in' ) }}">Sign in</a></small></p>
 </div>
 
 <div class="row marketing">
@@ -25,33 +32,15 @@
 </div>
 <div class="row marketing">
   <div class="col-lg-4">
-    <h4>Pricing</h4>
+    <h4>Transformative applications of targeted sequencing</h4>
   </div>
 
   <div class="col-lg-8">
-    <h5>Purified DNA in 384-well plates</h5>
-    <p>Create an account and request as many plates as you need. We will ship you 384-well plates and plate seals.</p>
-    <table class="table">
-      <tbody>
-        <tr>
-          <td>384-well plate (any number of samples)</td>
-          <td><strong>$110</strong></td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h5>Bacterial glycerol stocks in 384-well plates</h5>
-    <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
-    <table class="table">
-      <tbody>
-        <tr>
-          <td>384-well plate (any number of samples)</td>
-          <td><strong>$110</strong></td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h5>Greater plate density? High sample volume?</h5>
+    <h5>Enable iterative design-build-test cycles</h5>
+    <p>Transform your experiments to iterative experiments (using 10x cheaper sequencing, you can do 10x the number of experiments in an iterative fashion, with early results guiding later work) </p>
+    <h5>Expand to multi&ndash;time point profiing</h5>
+    <p>Transform single point experiments (gene expression profiling) to multi time point experiments with 10x the reads at the same cost </p>
+    <h5>Greater plate densities, higher sample volume</h5>
     <p><a href="">Contact us</a> for information about DNA sequencing
         from purified plasmid or bacterial colonies in 1,536-well plates.</p>
   </div>

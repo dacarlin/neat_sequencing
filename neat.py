@@ -65,10 +65,10 @@ def before_request():
     if 'user_id' in session:
         g.user = query_db('select * from user where user_id = ?', [session['user_id']], one=True)
 
-###### login/logout of users and registering
+###### sign_in/logout of users and sign_uping
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
+@app.route('/sign_in', methods=['GET', 'POST'])
+def sign_in():
     """Logs the user in."""
     if g.user:
         return redirect(url_for('index'))
@@ -85,11 +85,11 @@ def login():
             flash('You were logged in')
             session['user_id'] = user['user_id']
             return redirect(url_for('index'))
-    return render_template('login.html', error=error)
+    return render_template('sign_in.html', error=error)
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    """Registers the user."""
+@app.route('/sign_up', methods=['GET', 'POST'])
+def sign_up():
+    """sign_ups the user."""
     if g.user:
         return redirect(url_for('index'))
     error = None
@@ -112,9 +112,9 @@ def register():
               [request.form['email'], request.form['email'],
                generate_password_hash(request.form['password'])])
             db.commit()
-            flash('You were successfully registered and can login now')
-            return redirect( url_for( 'login' ) )
-    return render_template('register.html', error=error)
+            flash('You were successfully sign_uped and can sign_in now')
+            return redirect( url_for( 'sign_in' ) )
+    return render_template('sign_up.html', error=error)
 
 @app.route('/logout')
 def logout():
@@ -150,7 +150,7 @@ def add_message():
     for pt in range( plates_requested ):
         db.execute('''insert into plate(owner) values (?)''', (g.user['user_id'],))
         db.commit()
-    flash( 'Order was registered' )
+    flash( 'Order was sign_uped' )
     return redirect( url_for('index') )
 
 @app.route('/order_sequencing', methods=['POST'])
@@ -177,7 +177,7 @@ def order_sequencing():
     db = get_db()
     db.execute('''insert into sequencing(owner, plate_map) values (?,?)''', (g.user['user_id'],df.to_string()))
     db.commit()
-    flash( 'Plate was registered' )
+    flash( 'Plate was sign_uped' )
     return redirect( url_for( 'index' ) )
 
 # add some filters to jinja
