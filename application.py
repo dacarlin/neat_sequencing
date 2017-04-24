@@ -205,45 +205,21 @@ def order_sequencing():
 
 #################### admin dashboard
 
-def update_status( plate_id, new_status ):
-    db = get_db()
-    db.execute('update plate set status = ? where plate_id = ?', (new_status, plate_id))
-    db.commit()
-
-result_pkg = {
-    'sequencing_id': 1,
-    'url': 'http://google.com',
-    'heatmap_data': [ 0.1, 0.2, 0.3 ],
-}
-
-def update_url( result_pkg ):
-    db = get_db()
-    db.execute('update sequening set url = ? where sequencing_id = ?', (result_pkg['url'], result_pkg['sequencing_id']))
-    db.commit()
-
-
-@app.route('/orders', methods=['POST', 'GET'])
+@app.route('/orders')
 def orders():
-    if request.method == 'POST':
-        # we are updating something
-        pt_id = request.form['plate_id']
-        update_status( pt_id, request.form['new_status'] )
-        print( list(request.form.keys()) )
-        return redirect( url_for( 'orders') )
-    else:
-        plates = query_db('select * from plate')
-        sequencing = query_db('select * from sequencing')
-        users = query_db('select * from user')
-        return render_template( 'orders.html', plates=plates, sequencing=sequencing, users=users )
+    plates = query_db('select * from plate')
+    sequencing = query_db('select * from sequencing')
+    users = query_db('select * from user')
+    return render_template( 'orders.html', plates=plates, sequencing=sequencing, users=users )
 
 
 def html_status_codes( status_code ):
     st_code = str(status_code)
     codes = [
-        ('0','●<span style="color:#aaa">●●●</span> <small><br>Order placed</small>'),
-        ('1','<span style="color:#aaa">●</span>●<span style="color:#aaa;">●●</span> <small><br>Plate shipped</small>'),
-        ('2','<span style="color:#aaa">●●</span>●<span style="color:#aaa;">●</span> <small><br>Plate received</small>'),
-        ('3','<span style="color:#aaa">●●●</span>● <small><br>Plate in work cell</small>'),
+        ('0','●<span style="color:#aaa">●●●</span> <small>Order placed</small>'),
+        ('1','<span style="color:#aaa">●</span>●<span style="color:#aaa;">●●</span> <small>Order placed</small>'),
+        ('',''),
+        ('',''),
     ]
     codes = dict(codes)
     if st_code in codes.keys():

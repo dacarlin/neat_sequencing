@@ -16,15 +16,16 @@
     <!-- page title -->
     <title>Neat Sequencing</title>
 
-    <!-- Custom styles for this template -->
-    <link href="narrow-jumbotron.css" rel="stylesheet">
-
     <!-- Typefaces from Google Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Fira+Sans" rel="stylesheet">
+
+    <!-- progress bars -->
+    <script src='/static/nprogress.js'></script>
+    <link rel='stylesheet' href='/static/nprogress.css'/>
   </head>
 
   <body>
-    
+
     <div class="flashes">
     {% with flashes = get_flashed_messages() %}
       {% if flashes %}

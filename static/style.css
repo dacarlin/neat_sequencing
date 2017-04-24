@@ -1,3 +1,22 @@
+.admin.users
+{
+  text-align:center;
+  padding: 3rem;
+  background: #eee;
+  border-radius: 6px;
+  margin: 3rem;
+}
+
+.admin.users span
+{
+  font-size: 200%;
+}
+
+.admin.actions
+{
+  text-align: right; 
+}
+
 /* some colors */
 
 /* purples */
@@ -38,7 +57,7 @@ body {
 
 /* sequencing dashboard */
 
-.col-4 {
+.sidebar {
   border-right: 1px solid #e5e5e5;
 }
 
@@ -51,13 +70,49 @@ body {
 }
 
 
-p.none_yet
+div.none_yet
 /* for empty lists */
 {
   /* special styles that are welcoming */
+  background-color: #ffeeff;
+  padding: 1rem;
+  margin: 0 0 1.5rem 0;
+  border-radius: 6px;
+  color: #444;
 }
 
+div.none_yet p.lead
+{
+  text-align: center;
+  font-style: italic;
+  color: #9C009C;
+}
 
+/* erros in sign in sheet */
+
+div.error
+{
+  padding: 0.6rem;
+  margin: 1.6rem;
+}
+
+div.sign_in_panel
+{
+  margin: 2rem auto;
+  width: 32rem;
+  border: 0.5px solid #ccc;
+  box-shadow: 0 0.1rem 0.2rem #ccc;
+}
+
+div.sign_in_panel h3 {
+  padding: 1rem;
+  background-color: #ccc;
+}
+
+div.sign_in_panel form
+{
+  padding: 1.5rem;
+}
 
 
 

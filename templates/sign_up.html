@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block title %}Neat Sequencing: Sign Up{% endblock %}
+{% block body %}
+<div class="container">
+  <div class="sign_in_panel">
+    <h3>Sign up for Neat account</h3>
+    {% if error %}
+    <div class="error alert-warning">
+      <!-- <strong>Error:</strong> -->
+      {{ error }}
+    </div>
+    {% endif %}
+    <form action="" method="post">
+      <div class="form-group">
+        <label for="email">What’s your email?</label>
+        <input type="email" name="email" class="form-control" id="email" placeholder="Enter email">
+        <!-- <small class="form-text text-muted">We'll never share your email with anyone else.</small> -->
+      </div>
+      <div class="form-group">
+        <label for="password">Choose a password</label>
+        <input type="password" class="form-control" name="password" id="password" placeholder="Password">
+      </div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

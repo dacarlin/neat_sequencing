@@ -1,33 +1,107 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <title>Neat Dashboard</title>
+    <title>Neat Admin Dashboard</title>
     <meta charset="utf-8">
     <!-- <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Sans"/>
     <link rel="stylesheet" href="/static/style.css"/>
+    <script src='/static/nprogress.js'></script>
+    <link rel='stylesheet' href='/static/nprogress.css'/>
   </head>
   <body>
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-6">
-          <h4>Plates on orders</h4>
+    <div class="container">
+
+      <!-- big hero -->
+      <div class="admin users">
+        <h1><span>{{ users|length }}</span><br>total users</h1>
+      </div>
+
+      <!-- plates on order -->
+      <div class="admin plates">
+        <h1>Plates ({{plates|length}} total)</h1>
+        <div class="row">
           {% for plate in plates %}
-            <p>Plate ID: {{plate.plate_id}}</p>
-            <p>Owned by: User ID {{plate.owner}}</p>
-            <p></p>
+          <div class="col-1">
+            <p><strong>{{plate.plate_id}}</strong></p>
+          </div>
+          <div class="col-2">
+            <p>{{plate.owner}} (user ID)</p>
+          </div>
+          <div class="col-2">
+            <p>{{plate.status|status}}</p>
+          </div>
+          <div class="col-1">
+            <p>{{plate.issue}} (issue)</p>
+          </div>
+          <div class="col-6 actions admin">
+            <form method='post' action=''>
+              <input type="text" name="new_status" hidden value="1" />
+              <input type="text" name="plate_id" hidden value="{{plate.plate_id}}" />
+              <button type="submit" class="btn btn-primary btn-sm">Update status (1)</button>
+            </form>
+
+            <form method='post' action=''>
+              <input type="text" name="new_status" hidden value="2" />
+              <input type="text" name="plate_id" hidden value="{{plate.plate_id}}" />
+              <button type="submit" class="btn btn-secondary btn-sm">Update status (2)</button>
+            </form>
+            <!-- <p>
+              <a href="" class="btn btn-primary btn-sm">Send reminder email</a>
+              <a href="" class="btn btn-success btn-sm">Mark shipped</a>
+              <a href="" class="btn btn-danger btn-sm">Cancel</a>
+            </p> -->
+          </div>
+          {% else %}
+          <div class="col-12">
+            No plates yet
+          </div>
           {% endfor %}
         </div>
-        <div class="col-6">
-        <h4>Sequencing orders</h4>
+
+        <!-- sequencing orders -->
+        <h1>Sequencing orders</h1>
+        <div class="row">
         {% for s in sequencing %}
-          <p>{{s.sequencing_id}}</p>
+          <div class="col-2">
+            <p>{{s.sequencing_id}}</p>
+          </div>
+          <div class="col-2">
+            <p>{{s.issue}} (issue)</p>
+          </div>
+          <div class="col-2">
+            <p>{{ s.status|status }} </p>
+          </div>
+          <div class="col-2">
+            <p>{{s.owner}} (owner)</p>
+          </div>
+          <div class="col-1">
+            <p>{{s.plate_map[0:9]}}</p>
+          </div>
+          <div class="col-1">
+            <p>{{s.reference_text}}</p>
+          </div>
+          <div class="col-2 admin actions">
+            <a href="" class="btn btn-sm btn-primary">Mark done</a>
+          </div>
+          <!-- sequencing_id integer primary key autoincrement,
+          plate_map text not null,
+          reference_text text,
+          date_ordered integer,
+          status integer,
+          issue integer,
+          owner integer,
+          foreign key (owner) references user(user_id) -->
         {% endfor %}
         </div>
       </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    <script>
+      NProgress.start();
+      NProgress.done();
+    </script>
   </body>
 </html>

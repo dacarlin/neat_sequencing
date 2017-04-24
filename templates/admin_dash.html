@@ -9,8 +9,6 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Sans"/>
     <link rel="stylesheet" href="/static/style.css"/>
-    <script src='/static/nprogress.js'></script>
-    <link rel='stylesheet' href='/static/nprogress.css'/>
   </head>
   <body>
     <nav class="navbar navbar-light bg-faded">
@@ -18,18 +16,17 @@
     </nav>
     <div class="container-fluid">
       <div class="row">
-        <div class="col-md-4 sidebar">
+        <div class="col-4">
           <div class="place_order">
             <h4>Order plates</h4>
             <form class="" action="{{ url_for('add_plate') }}" method="post">
               <div class="form-group">
                 <label for="plate_number_select">Select number of plates</label>
                 <select class="form-control" id="plate_number_select" name="plate_number_select">
-                  <option>1 plate, 384 well</option>
-                  <option>2 plates, 384 well</option>
-                  <option>5 plates, 384 well</option>
-                  <option>10 plates, 384 well</option>
-                  <option>20 plates, 384 well</option>
+                  <option>1 plate, 384 well + seal</option>
+                  {% for i in range( 2, 11 ) %}
+                  <option>{{i}} plates, 384 well + seals</option>
+                  {% endfor %}
                 </select>
                 <small class="form-text text-muted">Plates arrive in 2-3 business days. Plates are immediately available in your account.</small>
               </div>
@@ -63,21 +60,21 @@
               </div>
               <div class="form-group">
                <label for="reference_text">Include a reference</label>
-               <input type="text" class="form-control" id="reference_text" name="reference_text" placeholder="My order name">
+               <input type="email" class="form-control" id="reference_text" name="reference_text" placeholder="My order name">
                <small class="form-text text-muted">The reference is just for your records</small>
              </div>
              <button type="submit" class="btn btn-success">Submit</button>
             </form>
           </div>
         </div>
-        <div class="col-md-8">
+        <div class="col-8">
           <div class="place_order">
             <h4>My sequencing</h4>
             {% for seq in sequencing %}
               <div class="row seq_order">
                 <div class="col-3">
                   <small><strong>Reference</strong></small><br>
-                  <a href="">{{ seq.reference_text }}</a>
+                  <a href="">Neat Order</a>{{ seq.reference_text }}
                 </div>
                 <div class="col-3">
                   <small><strong>Order Number</strong></small><br>
@@ -85,7 +82,7 @@
                 </div>
                 <div class="col-3">
                   <small><strong>Order Status</strong></small><br>
-                  {{seq.status|status}}
+                  ●<span style="color:#aaa">●●●</span> Order placed
                 </div>
                 <div class="col-3">
                   <small><strong>Results</strong></small><br>
@@ -94,42 +91,32 @@
               </div>
               <hr>
             {% else %}
-              <div class="none_yet">
-                <p class="lead">No sequencing yet!</p>
-                <p>You can begin placing sequencing orders once you've added some
-                  plates to your inventory. </p>
-                <ol>
-                  <li>Add some plates to your inventory from the sidebar</li>
-                  <li>Tell us where your samples are using our <a href="">template for plate map</a></li>
-                  <li>Submit an order for sequencing</li>
-                  <li>Mail us your plates using the provided packaging</li>
-                </ol>
-              </div>
+              <div><p class="no_yet">No sequencing yet!</p></div>
             {% endfor %}
           </div>
           <div class="place_order">
             <h4>Current inventory of plates</h4>
-            {% for plate in plates %}
             <div class="row">
+            {% for plate in plates %}
               <div class="col-4">
                 <small><strong>Plate ID</strong></small><br>
                 Neat Plate {{ plate.plate_id }}
               </div>
               <div class="col-4">
-                <!-- <small>Plate Status</small><br> -->
-                {{plate.status|status}}
+                <small>Plate Status</small><br>
+                ●<span style="color:#aaa">●●●</span> Order placed
               </div>
               <div class="col-4">
                 <small>Support</small><br>
                 <a href="">Report an issue</a>
               </div>
-            </div>
+              <hr>
             {% else %}
-            <div class="none_yet">
-              <p class="lead">No plates yet!</p>
-              <p><small class="muted"><strong>&larr;</strong> Place an order in the sidebar</p>
+            <div class="col-12">
+              <p class="none_yet">No plates yet!<br><small class="muted"><strong>&larr;</strong> Place an order in the sidebar</p>
             </div>
             {% endfor %}
+          </div> <!-- closes row -->
           </div>
         </div>
       </div>
@@ -139,9 +126,5 @@
     </div>
     <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
-    <script>
-      NProgress.start();
-      NProgress.done();
-    </script>
   </body>
 </html>
