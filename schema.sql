@@ -21,8 +21,9 @@ drop table if exists sequencing;
 create table sequencing (
   sequencing_id integer primary key autoincrement,
   plate_map text not null,
+  n_samples integer, 
   reference_text text,
-  date_ordered integer, 
+  date_ordered integer,
   status integer, -- will eventually be a code, 0, 1, 2, 3 or something
   issue integer, -- has customer flagged an issue?
   owner integer,

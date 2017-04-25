@@ -10,25 +10,18 @@
         {{ error }}
       </div>
       {% endif %}
-  <!-- <form action="" method="post">
-    <dl>
-      <dt>user_name:
-      <dd><input type="text" name="user_name" size="30" value="{{ request.form.user_name }}">
-      <dt>Password:
-      <dd><input type="password" name="password" size="30">
-    </dl>
-    <div class="actions"><input type="submit" value="Sign In"></div>
-  </form> -->
-  <form action="" method="post">
-  <div class="form-group">
-    <label for="user_name">Email address</label>
-    <input type="email" name="user_name" class="form-control" id="user_name" placeholder="Enter email">
-    <small class="form-text text-muted">We'll never share your email with anyone else.</small>
+      <form action="" method="post">
+      <div class="form-group">
+        <label for="user_name">Email address</label>
+        <input type="email" name="user_name" class="form-control" id="user_name" placeholder="Enter email">
+        <small class="form-text text-muted">We'll never share your email with anyone else.</small>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" class="form-control" name="password" id="password" placeholder="Password">
+      </div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
   </div>
-  <div class="form-group">
-    <label for="password">Password</label>
-    <input type="password" class="form-control" name="password" id="password" placeholder="Password">
-  </div>
-  <button type="submit" class="btn btn-primary">Submit</button>
-</form>
+</div>
 {% endblock %}

@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
 from sqlite3 import dbapi2 as sqlite3
 from datetime import datetime
-from flask import Flask, request, session, url_for, redirect, render_template, abort, g, flash, _app_ctx_stack, Markup
+from flask import (Flask, request, session, url_for, redirect,
+                   render_template, abort, g, flash, _app_ctx_stack, Markup)
 from werkzeug import check_password_hash, generate_password_hash
 from io import StringIO, BytesIO
 import pandas
@@ -20,7 +20,6 @@ app.config.from_object( __name__ )
 
 # database connections
 # basically taken from flask example
-# badly need a rework
 
 def get_db():
     """Opens a new database connection if there is none yet for the
@@ -75,6 +74,7 @@ def before_request():
         g.user = query_db('select * from user where user_id = ?', [session['user_id']], one=True)
 
 ###### sign in/out of users
+######
 
 @app.route('/sign_in', methods=['GET', 'POST'])
 def sign_in():
@@ -140,9 +140,10 @@ def logout():
     """Logs the user out."""
     flash('You were logged out')
     session.pop('user_id', None)
-    return redirect( '/' )
+    return redirect( url_for( 'sign_in') )
 
 ################# dashbaord, ordering plates, orderig sequeinc g
+##############
 
 @app.route('/')
 def index():
@@ -174,7 +175,8 @@ def add_plate():
 
 @app.route('/order_sequencing', methods=['POST'])
 def order_sequencing():
-    """The user places an order for sequencing"""
+
+    # abort if no user
     if 'user_id' not in session:
         abort(401)
 
@@ -189,14 +191,14 @@ def order_sequencing():
         return redirect( '/' )
     if file_handle:
         f_str = request.files[ 'file'].read().decode( 'utf-8' )
-        df = pandas.read_csv( StringIO(f_str), index_col=0 )
+        df = pandas.read_csv( StringIO(f_str), index_col=0 ).dropna()
 
-    n_samples = len( df )
+    n_samples = len( df.dropna() )
 
     db = get_db()
     db.execute(
-        '''insert into sequencing(owner, plate_map, status, issue, reference_text) values (?,?,?,?,?)''',
-        [g.user['user_id'], df.to_string(), 0, 0, request.form['reference_text'] ]
+        '''insert into sequencing(owner, plate_map, status, issue, reference_text, n_samples) values (?,?,?,?,?)''',
+        [g.user['user_id'], df.to_string(), 0, 0, request.form['reference_text'], n_samples ]
     )
     db.commit()
     flash( 'Plate was sign_uped' )
@@ -232,6 +234,8 @@ def orders():
         return redirect( url_for( 'orders') )
     else:
         plates = query_db('select * from plate')
+        # plates is list of dict
+        # can we do whatever we want to the dicts
         sequencing = query_db('select * from sequencing')
         users = query_db('select * from user')
         return render_template( 'orders.html', plates=plates, sequencing=sequencing, users=users )
@@ -250,6 +254,12 @@ def html_status_codes( status_code ):
         return Markup(codes[ st_code ])
 
 
+def html_plate_map(plate_map_string):
+    df = pandas.read_csv(StringIO(plate_map_string), sep='\s+', index_col=0)
+    print(df)
+    return Markup(df)
+
 # add some filters to jinja
 app.jinja_env.filters['datetimeformat'] = format_datetime
 app.jinja_env.filters['status'] = html_status_codes
+app.jinja_env.filters['plate_map'] = html_plate_map

@@ -14,7 +14,15 @@
 
 .admin.actions
 {
-  text-align: right; 
+  text-align: right;
+}
+
+
+/* hero */
+
+div.hero
+{
+  margin: 2rem 0 0 0;
 }
 
 /* some colors */
