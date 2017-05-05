@@ -1,10 +1,22 @@
+/* plate map place order */
+.plate_chart {
+  text-align: center;
+  padding: 1rem;
+}
+
+.dangerous {
+  background: rgba(255,0,0,0.1);
+}
+
 .admin.users
 {
+  width: 50rem;
+  margin: 2rem auto 5rem auto;
   text-align:center;
   padding: 3rem;
   background: #eee;
   border-radius: 6px;
-  margin: 3rem;
+
 }
 
 .admin.users span
@@ -73,8 +85,8 @@ body {
   padding-top: 1rem;
 }
 
-.col-4 form {
-  padding-bottom: 3rem;
+.sidebar form {
+  padding-bottom: 2rem;
 }
 
 

@@ -43,7 +43,7 @@
                 <label for="plate_id">Select from your plates</label>
                 <select class="form-control" id="plate_id">
                   {% for pt in plates %}
-                  <option>Plate ID: {{ pt.plate_id }}</option>
+                  <option>Plate ID: {{ pt.id }}</option>
                   {% endfor %}
                 </select>
                 <!-- <small class="form-text text-muted">You can order sequencing before your plates arrive</small> -->
@@ -81,15 +81,15 @@
                 </div>
                 <div class="col-3">
                   <small><strong>Order Number</strong></small><br>
-                  Neat Order {{ seq.sequencing_id }}
+                  Neat Order {{ seq.id }}
                 </div>
                 <div class="col-3">
                   <small><strong>Order Status</strong></small><br>
-                  {{seq.status|status}}
+                  {{seq.status|status}}({{seq.issue}})
                 </div>
                 <div class="col-3">
                   <small><strong>Results</strong></small><br>
-                  <a href="">AWS link</a>
+                  📊 <a href="">AWS link</a>
                 </div>
               </div>
               <hr>
@@ -113,10 +113,10 @@
             <div class="row">
               <div class="col-4">
                 <small><strong>Plate ID</strong></small><br>
-                Neat Plate {{ plate.plate_id }}
+                Neat Plate {{ plate.id }}
               </div>
               <div class="col-4">
-                <!-- <small>Plate Status</small><br> -->
+                <small>Plate Status</small><br>
                 {{plate.status|status}}
               </div>
               <div class="col-4">
@@ -134,7 +134,7 @@
         </div>
       </div>
       <div class="footer">
-        <p>Logged in as <a href="">{{g.user.user_name}}</a> | <a href="/logout">Log out</a> </p>
+        <p><a href="/help">Help</a> | Logged in as <a href="">{{g.user.email}}</a> | <a href="/logout">Log out</a> </p>
       </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>

@@ -9,49 +9,81 @@
     <link rel="stylesheet" href="/static/style.css"/>
     <script src='/static/nprogress.js'></script>
     <link rel='stylesheet' href='/static/nprogress.css'/>
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.css">
+    <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.js"></script>
   </head>
   <body>
     <div class="container">
+
+      <h1 style='text-align:center;padding:2.2rem;color:purple;'>Neat Sequencing Admin Dashboard</h1>
 
       <!-- big hero -->
       <div class="admin users">
         <h1><span>{{ users|length }}</span><br>total users</h1>
       </div>
 
+
+      <!-- users DataTables table -->
+      <h1>Users ({{users|length}} total)</h1>
+      <table id="table_id" class="display">
+        <thead>
+          <tr>
+            <th>User ID</th>
+            <th>User email address</th>
+            <th>Number of plates</th>
+            <th>Number of orders</th>
+            <th>Date joined</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users %}
+          <tr>
+            <td>{{user.id}}</td>
+            <td>{{user.email}}</td>
+            <td>{{user.n_plates}}</td>
+            <td>{{user.n_seq}}</td>
+            <td>{{user.date_joined|int|datetimeformat}}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <hr>
+
       <!-- plates on order -->
-      <div class="admin plates">
+      <div class="admin plates table">
         <h1>Plates ({{plates|length}} total)</h1>
         <div class="row">
           {% for plate in plates %}
-          <div class="col-1">
-            <p><strong>{{plate.plate_id}}</strong></p>
+          <div class="col-2">
+            <p><strong>{{plate.id}}</strong></p>
           </div>
           <div class="col-2">
             <p>{{plate.owner}} (user ID)</p>
           </div>
           <div class="col-2">
-            <p>{{plate.status|status}}</p>
-          </div>
-          <div class="col-1">
-            <p>{{plate.issue}} (issue)</p>
+            <p>{{plate.status|status}}, {{ plate.issue }}</p>
           </div>
           <div class="col-6 actions admin">
-            <form method='post' action=''>
-              <input type="text" name="new_status" hidden value="1" />
-              <input type="text" name="plate_id" hidden value="{{plate.plate_id}}" />
-              <button type="submit" class="btn btn-primary btn-sm">Update status (1)</button>
+            <form method='post' action='' class="form-inline btn">
+              <input hidden type="text" name="form_tag" value="advance"/>
+              <input type="text" name="new_status" hidden value="{{plate.status + 1}}" />
+              <input type="text" name="plate_id" hidden value="{{plate.id}}" />
+              <button type="submit" class="btn btn-primary btn-sm">Advance status</button>
             </form>
-
-            <form method='post' action=''>
-              <input type="text" name="new_status" hidden value="2" />
-              <input type="text" name="plate_id" hidden value="{{plate.plate_id}}" />
-              <button type="submit" class="btn btn-secondary btn-sm">Update status (2)</button>
+            <form method='post' action='' class="form-inline btn">
+              <input hidden type="text" name="form_tag" value="flag"/>
+              <input type="text" name="new_status" hidden value="{{plate.status}}" />
+              <input type="text" name="plate_id" hidden value="{{plate.id}}" />
+              <button type="submit" class="btn btn-warning btn-sm">Flag</button>
             </form>
-            <!-- <p>
-              <a href="" class="btn btn-primary btn-sm">Send reminder email</a>
-              <a href="" class="btn btn-success btn-sm">Mark shipped</a>
-              <a href="" class="btn btn-danger btn-sm">Cancel</a>
-            </p> -->
+            <form method='post' action='' class="form-inline btn">
+              <input hidden type="text" name="form_tag" value="delete"/>
+              <input type="text" name="new_status" hidden value="-1" />
+              <input type="text" name="plate_id" hidden value="{{plate.id}}" />
+              <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+            </form>
           </div>
           {% else %}
           <div class="col-12">
@@ -59,13 +91,14 @@
           </div>
           {% endfor %}
         </div>
+        <hr>
 
         <!-- sequencing orders -->
         <h1>Sequencing orders</h1>
         <div class="row">
         {% for s in sequencing %}
           <div class="col-2">
-            <p>{{s.sequencing_id}}</p>
+            <p>{{s.id}}</p>
           </div>
           <div class="col-2">
             <p>{{s.issue}} (issue)</p>
@@ -77,15 +110,10 @@
             <p>{{s.owner}} (owner)</p>
           </div>
           <div class="col-1">
-            <p>{{s.plate_map[0:9]}}</p>
+            <p>{{s.map[0:9]}}</p>
           </div>
           <div class="col-1">
             <p>{{s.reference_text}}</p>
-          </div>
-          <div class="col-12">
-            <pre>
-              {{s.plate_map|plate_map}}
-            </pre>
           </div>
           <div class="col-2 admin actions">
             <a href="" class="btn btn-sm btn-primary">Mark done</a>
@@ -101,11 +129,28 @@
         {% endfor %}
         </div>
       </div>
+      <hr>
+      <hr>
+
+      <div class="dangerous">
+        <h1>Dangerous</h1>
+
+        <form method='post' action=''>
+          <input hidden type="text" name="form_tag" value="add_users"/>
+          <input type="text" name="n_users" value="50" />
+          <button type="submit" class="btn">Add users with plates and sequencing orders</button>
+        </form>
+
+      </div>
     </div>
-    <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+
     <script>
       NProgress.start();
+
+      $(document).ready( function () {
+          $('#table_id').DataTable();
+      } );
+
       NProgress.done();
     </script>
   </body>

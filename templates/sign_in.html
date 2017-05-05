@@ -6,14 +6,14 @@
       <h3>Sign in to Neat</h3>
       {% if error %}
       <div class="error alert-warning">
-        <strong>Error:</strong>
+        <strong>⚠️ Error:</strong>
         {{ error }}
       </div>
       {% endif %}
       <form action="" method="post">
       <div class="form-group">
-        <label for="user_name">Email address</label>
-        <input type="email" name="user_name" class="form-control" id="user_name" placeholder="Enter email">
+        <label for="email">Email address</label>
+        <input type="email" name="email" class="form-control" id="email" placeholder="Enter email">
         <small class="form-text text-muted">We'll never share your email with anyone else.</small>
       </div>
       <div class="form-group">

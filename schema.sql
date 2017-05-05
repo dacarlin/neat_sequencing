@@ -1,31 +1,41 @@
 drop table if exists user;
 create table user (
-  user_id integer primary key autoincrement,
-  user_name text not null,
+  id integer primary key autoincrement,
   email text not null,
   pw_hash text not null,
-  date_joined integer
+  date_joined date
 );
 
 drop table if exists plate;
 create table plate (
-  plate_id integer primary key autoincrement,
+  id integer primary key autoincrement,
+  physical integer,
   owner integer,
   status integer,
   issue integer,
-  date_ordered integer,
-  foreign key (owner) references user(user_id)
+  date_ordered date
 );
+
+-- plate states
+-- 0. ordered via web
+-- 1. we have shipped to customer
+-- 2. customer has used the plate in a sequencing order
+-- 3. we have received the plate
 
 drop table if exists sequencing;
 create table sequencing (
-  sequencing_id integer primary key autoincrement,
-  plate_map text not null,
-  n_samples integer, 
-  reference_text text,
-  date_ordered integer,
-  status integer, -- will eventually be a code, 0, 1, 2, 3 or something
-  issue integer, -- has customer flagged an issue?
+  id integer primary key autoincrement,
+  physical integer,
   owner integer,
-  foreign key (owner) references user(user_id)
+  map text not null,
+  reference_text text,
+  date_ordered date,
+  status integer,
+  issue integer
 );
+
+-- sequencing states
+-- 0. ordered via the web
+-- 1. all plates involved have been received
+-- 2. data are on the sequencer
+-- 2. results have been uploaded and are available
