@@ -11,5 +11,6 @@ pytz==2017.2
 PyYAML==3.12
 requests==2.14.2
 six==1.10.0
+SQLAlchemy==1.1.10
 tornado==4.5.1
 Werkzeug==0.12.2

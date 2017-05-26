@@ -12,7 +12,7 @@ from io import StringIO, BytesIO
 import time
 from datetime import datetime
 
-from .display import html_status_codes, html_status_codes_human
+from display import html_status_codes, html_status_codes_human
 
 ######################################################
 ######################################################
