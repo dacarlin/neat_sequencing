@@ -13,17 +13,62 @@
     <link rel='stylesheet' href='/static/nprogress.css'/>
   </head>
   <body>
-    <nav class="navbar navbar-light bg-faded">
-      <a class="navbar-brand" href="#">Neat Dashboard</a>
-    </nav>
+    <ul class="nav ">
+      <li class="nav-item">
+        <a class="nav-link active" href="#">DNA Sequencing</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Plates</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">{{ g.user['email'] }}</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Support</a>
+      </li>
+      <!-- <li class="nav-item">
+        <a class="nav-link disabled" href="#">Disabled</a>
+      </li> -->
+    </ul>
+
+    <div class="user_home">
+        <h5>
+
+        </h5>
+        <p>
+          {% if sequencing|length == plates|length == 0 %}
+          New account
+          {% else %}
+          {{sequencing|length}} orders, {{plates|length}} plates
+          {% endif %}
+        </p>
+        <p>
+          <a href="{{ url_for('account') }}">Account Settings</a>
+        </p>
+    </div>
+
+
     <div class="container-fluid">
       <div class="row">
         <div class="col-md-4 sidebar">
+
+          <div class="sidebar_flashes">
+          {% with flashes = get_flashed_messages() %}
+            {% if flashes %}
+              <ul class="flashes">
+              {% for message in flashes %}
+                <li class="dismiss flash">✉️ {{ message }}</li>
+              {% endfor %}
+              </ul>
+            {% endif %}
+          {% endwith %}
+          </div>
+          <!-- 📦📅🔍💬 -->
           <div class="place_order">
             <h4>Order plates</h4>
             <form class="" action="{{ url_for('add_plate') }}" method="post">
               <div class="form-group">
-                <label for="plate_number_select">Select number of plates</label>
+                <label for="plate_number_select">Order plates</label>
                 <select class="form-control" id="plate_number_select" name="plate_number_select">
                   <option>1 plate, 384 well</option>
                   <option>2 plates, 384 well</option>
@@ -33,16 +78,17 @@
                 </select>
                 <small class="form-text text-muted">Plates arrive in 2-3 business days. Plates are immediately available in your account.</small>
               </div>
-             <button type="submit" class="btn btn-success">Add to my account</button>
+             <button type="submit" class="btn btn-secondary">Buy Plates</button>
             </form>
           </div>
+
           <div class="place_order">
             <h4>Order sequencing</h4>
             <form class="" action="{{ url_for('order_sequencing') }}" method="post" enctype="multipart/form-data">
               <div class="form-group">
                 <label for="plate_id">Select from your plates</label>
-                <select class="form-control" id="plate_id">
-                  {% for pt in plates %}
+                <select class="form-control" id="plate_id" name="plate_id">
+                  {% for pt in plates if pt.status == 0 %}
                   <option>Plate ID: {{ pt.id }}</option>
                   {% endfor %}
                 </select>
@@ -54,9 +100,9 @@
               </div>
               <div class="form-group">
                 <div class="btn-group">
-                  <label class="btn btn-primary" for="file_selector">
+                  <label class="btn btn-secondary" for="file_selector">
                       <input id="file_selector" name="file" type="file" style="display:none;" onchange="$('#upload-file-info').html($(this).val());">
-                      Choose file …
+                      Choose Plate Map
                   </label>
                   <label class="btn btn-secondary" id="upload-file-info"></label>
                 </div>
@@ -66,62 +112,79 @@
                <input type="text" class="form-control" id="reference_text" name="reference_text" placeholder="My order name">
                <small class="form-text text-muted">The reference is just for your records</small>
              </div>
-             <button type="submit" class="btn btn-success">Submit</button>
+             <button type="submit" class="btn btn-secondary">Next Step</button>
             </form>
           </div>
         </div>
+
+
+
+        <!-- sequencing orders -->
+
         <div class="col-md-8">
-          <div class="place_order">
-            <h4>My sequencing</h4>
-            {% for seq in sequencing %}
-              <div class="row seq_order">
-                <div class="col-3">
-                  <small><strong>Reference</strong></small><br>
-                  <a href="">{{ seq.reference_text }}</a>
-                </div>
-                <div class="col-3">
-                  <small><strong>Order Number</strong></small><br>
-                  Neat Order {{ seq.id }}
-                </div>
-                <div class="col-3">
-                  <small><strong>Order Status</strong></small><br>
-                  {{seq.status|status}}({{seq.issue}})
-                </div>
-                <div class="col-3">
-                  <small><strong>Results</strong></small><br>
-                  📊 <a href="">AWS link</a>
-                </div>
-              </div>
-              <hr>
+          <h2>All DNA Sequencing</h2>
+          {% for seq in sequencing %}
+          <div class="card">
+          <div class="card-header">
+            Sequencing Order
+          </div>
+          <div class="card-block">
+            <h3 class="card-title">
+              Sequencing Order #{{seq.id}}
+               <br> {{ seq.status|status }}
+            </h3>
+            <p class="card-text">
+              DNA sequencing order placed {{ seq.date_ordered }}
+              with supporting text below as a natural lead-in to
+              additional content.
+            </p>
+            <a href="#" class="btn btn-primary disabled">Get Results</a>
+          </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             {% else %}
               <div class="none_yet">
                 <p class="lead">No sequencing yet!</p>
-                <p>You can begin placing sequencing orders once you've added some
-                  plates to your inventory. </p>
-                <ol>
-                  <li>Add some plates to your inventory from the sidebar</li>
-                  <li>Tell us where your samples are using our <a href="">template for plate map</a></li>
-                  <li>Submit an order for sequencing</li>
-                  <li>Mail us your plates using the provided packaging</li>
-                </ol>
+                <p>No sequencing current exists for your account. <a href="">Order DNA sequencing</a></p>
               </div>
             {% endfor %}
           </div>
           <div class="place_order">
             <h4>Current inventory of plates</h4>
             {% for plate in plates %}
-            <div class="row">
-              <div class="col-4">
-                <small><strong>Plate ID</strong></small><br>
-                Neat Plate {{ plate.id }}
-              </div>
-              <div class="col-4">
-                <small>Plate Status</small><br>
+            <div class="row plate_order">
+              <div class="col-1">
                 {{plate.status|status}}
               </div>
-              <div class="col-4">
-                <small>Support</small><br>
-                <a href="">Report an issue</a>
+              <div class="col-3">
+                <strong>Neat Plate {{ plate.id }}</strong><br>
+                384-well Echo
+              </div>
+              <div class="col-3">
+                <small><strong>Status Report</strong></small><br> {{plate.status|status_human}}<br>
+              </div>
+              <div class="col-3">
+                <small><strong>Date Ordered</strong></small><br>
+                {{plate.date_ordered|datetimeformat}}
+              </div>
+              <div class="col-2">
+                <small><strong>Support</strong></small><br>
+                <a href="" class="danger">Report issue</a>
               </div>
             </div>
             {% else %}
@@ -141,6 +204,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
     <script>
       NProgress.start();
+
+
+      $( ".dismiss" ).click(function() {
+        $this.fadeOut( "slow", function() {
+          // Animation complete.
+        });
+      });
+
+
       NProgress.done();
     </script>
   </body>

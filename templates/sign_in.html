@@ -1,9 +1,20 @@
 {% extends "layout.html" %}
-{% block title %}Neat Sequencing - Log In{% endblock %}
+{% block title %}Neat Sequencing - Sign In{% endblock %}
 {% block body %}
   <div class="container">
     <div class="sign_in_panel">
       <h3>Sign in to Neat</h3>
+      <div class="flashes">
+      {% with flashes = get_flashed_messages() %}
+        {% if flashes %}
+          <ul class="flashes">
+          {% for message in flashes %}
+            <li>{{ message }}</li>
+          {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+      </div>
       {% if error %}
       <div class="error alert-warning">
         <strong>⚠️ Error:</strong>
@@ -20,7 +31,7 @@
         <label for="password">Password</label>
         <input type="password" class="form-control" name="password" id="password" placeholder="Password">
       </div>
-      <button type="submit" class="btn btn-primary">Submit</button>
+      <button type="submit" class="btn btn-primary">Go To Console</button>
     </form>
   </div>
 </div>

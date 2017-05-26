@@ -1,12 +1,21 @@
-# -*- coding: utf-8 -*-
-from sqlite3 import dbapi2 as sqlite3
-from datetime import datetime
 from flask import Flask, request, session, url_for, redirect, render_template, abort, g, flash, _app_ctx_stack, Markup
 from werkzeug import check_password_hash, generate_password_hash
-from io import StringIO, BytesIO
 import pandas
+from bokeh.plotting import figure
+from bokeh.models import FixedTicker, FuncTickFormatter
+from bokeh.resources import CDN
+from bokeh.embed import file_html
+from itertools import product
+from sqlite3 import dbapi2 as sqlite3
+import random
+from io import StringIO, BytesIO
 import time
+from datetime import datetime
 
+from .display import html_status_codes, html_status_codes_human
+
+######################################################
+######################################################
 # this for debug only
 # need to find good settigns for deploy
 
@@ -18,9 +27,10 @@ SECRET_KEY = 'secret key!'
 app = Flask( __name__ )
 app.config.from_object( __name__ )
 
+######################################################
+######################################################
 # database connections
 # basically taken from flask example
-# badly need a rework
 
 def get_db():
     """Opens a new database connection if there is none yet for the
@@ -59,9 +69,9 @@ def query_db(query, args=(), one=False):
     rv = cur.fetchall()
     return (rv[0] if rv else None) if one else rv
 
-def get_user_id(user_name):
+def get_user_id(email):
     """Convenience method to look up the id for a user_name."""
-    rv = query_db('select user_id from user where user_name = ?', [user_name], one=True)
+    rv = query_db('select id from user where email = ?', [email], one=True)
     return rv[0] if rv else None
 
 def format_datetime(timestamp):
@@ -72,9 +82,10 @@ def format_datetime(timestamp):
 def before_request():
     g.user = None
     if 'user_id' in session:
-        g.user = query_db('select * from user where user_id = ?', [session['user_id']], one=True)
+        g.user = query_db('select * from user where id = ?', [session['user_id']], one=True)
 
 ###### sign in/out of users
+######
 
 @app.route('/sign_in', methods=['GET', 'POST'])
 def sign_in():
@@ -84,15 +95,14 @@ def sign_in():
     error = None
     if request.method == 'POST':
         user = query_db('''select * from user where
-            user_name = ?''', [request.form['user_name']], one=True)
+            email = ?''', [request.form['email']], one=True)
         if user is None:
-            error = 'No record of user name "{}". Try again?'.format(request.form['user_name'])
-        elif not check_password_hash(user['pw_hash'],
-                                     request.form['password']):
+            error = 'No record of email "{}". Try again?'.format(request.form['email'])
+        elif not check_password_hash(user['pw_hash'],request.form['password']):
             error = 'Invalid password'
         else:
             flash('You were logged in')
-            session['user_id'] = user['user_id']
+            session['user_id'] = user['id']
             return redirect(url_for('index'))
     # if a get request
     return render_template('sign_in.html', error=error)
@@ -123,15 +133,25 @@ def sign_up():
             error = 'The email "{}" is already being used. Is this your email address? Please email us service@neatseq.com'.format(request.form['email'])
         else:
             db = get_db()
-            db.execute('''insert into user (
-              user_name, email, pw_hash) values (?, ?, ?)''',
-              [request.form['email'], request.form['email'],
-               generate_password_hash(request.form['password'])])
-               # could add a date here (date joined)
+            db.execute('''
+                insert into user
+                (email, pw_hash, date_joined)
+                values (?, ?, ?)''',
+                [
+                    request.form['email'],
+                    generate_password_hash(request.form['password']),
+                    time.time(),
+                ]
+            ) # ends "execuate"
             db.commit()
-            flash('Creating sequencing dashboard')
-            flash('You were successfully signed up and your sequencing dashboard was created. You can sign in now!')
-            return redirect( url_for( 'sign_in' ) )
+            # now need to read this user out of the db
+            # to AUTO LOG IN motherfuckers
+            user = query_db('''select * from user where
+                email = ?''', [request.form['email']], one=True)
+            session['user_id'] = user['id']
+            flash('Thanks for creating an account, and welcome to Neat!')
+            return redirect(url_for('index'))
+
     # else, if this is a get request
     return render_template('sign_up.html', error=error)
 
@@ -140,9 +160,10 @@ def logout():
     """Logs the user out."""
     flash('You were logged out')
     session.pop('user_id', None)
-    return redirect( '/' )
+    return redirect( url_for( 'sign_in') )
 
 ################# dashbaord, ordering plates, orderig sequeinc g
+##############
 
 @app.route('/')
 def index():
@@ -152,9 +173,10 @@ def index():
         return render_template( 'hero.html' )
 
     # if there is a user, then display dashboard
-    plates = query_db('''select * from plate where owner = ?''', (g.user['user_id'],) )
-    sequencing = query_db('''select * from sequencing where owner = ?''', (g.user['user_id'],) )
+    plates = query_db('''select * from plate where owner = ?''', (g.user['id'],) )
+    sequencing = query_db('''select * from sequencing where owner = ?''', (g.user['id'],) )
     return render_template('dash.html', plates=plates, sequencing=sequencing)
+
 
 @app.route('/add_plate', methods=['POST'])
 def add_plate():
@@ -167,18 +189,28 @@ def add_plate():
     db = get_db()
     plates_requested = int( request.form[ 'plate_number_select' ].split()[0] )
     for pt in range( plates_requested ):
-        db.execute('''insert into plate(owner,status,issue,date_ordered) values (?,?,?,?)''', (g.user['user_id'],0,0,int(time.time())))
+        db.execute('''insert into plate(owner,status,issue,date_ordered) values (?,?,?,?)''', (g.user['id'],0,0,int(time.time())))
         db.commit()
-    flash( 'Order was sign_uped' )
+    flash( 'Your order was recieved! Plates are immediately shown in the management console, and arrive in 2-3 days'.format(plates_requested) )
     return redirect( url_for('index') )
+
+def map_well_to_coords(well):
+    def map_letter_to_int(letter):
+        d = dict(zip('ABCDEFGHIJKLMNOP',range(1,17)))
+        return d[letter]
+    letter = well[0]
+    number = well[1:]
+    x = int(number)
+    y = map_letter_to_int(letter)
+    return x, y
 
 @app.route('/order_sequencing', methods=['POST'])
 def order_sequencing():
-    """The user places an order for sequencing"""
+
+    # abort if no user
     if 'user_id' not in session:
         abort(401)
-
-    print( 'File keys:', list( request.files.keys() ) )
+    error = ''
 
     if 'file' not in request.files:
         flash( 'No file part' )
@@ -188,44 +220,162 @@ def order_sequencing():
         flash( 'No file selected' )
         return redirect( '/' )
     if file_handle:
-        f_str = request.files[ 'file'].read().decode( 'utf-8' )
-        df = pandas.read_csv( StringIO(f_str), index_col=0 )
+        f_str = StringIO(request.files['file'].read().decode('utf-8'))
 
-    n_samples = len( df )
+    try:
+        df = pandas.read_csv(f_str, index_col=0).dropna()
+    except Exception as e:
+        flash( 'Could not parse plate map' )
 
+    plot = figure(tools='', plot_width=480, plot_height=320,)
+    plot = figure(tools='', plot_width=480, plot_height=320,)
+    plot.xgrid.grid_line_color = None
+    plot.ygrid.grid_line_color = None
+    plot.xaxis[0].ticker=FixedTicker(ticks=list(range(0+1,24+1)))
+    plot.yaxis[0].ticker=FixedTicker(ticks=list(range(0+1,16+1)))
+    plot.logo=None
+
+    xlabel = {i+1: s for i, s in enumerate('ABCDEFGHIJKLMNOPQRSTUVWX')}
+    ylabel = {i+1: s for i, s in enumerate(list(range(1,17))[::-1])}
+    plot.xaxis.formatter = FuncTickFormatter(code="""var labels = %s;return labels[tick];""" % xlabel)
+    plo.tyaxis.formatter = FuncTickFormatter(code="""var labels = %s;return labels[tick];""" % ylabel)
+    rt
+    plot.outline_line_width = 1
+    plot.outline_line_alpha = 1
+    plot.outline_line_color = "black"
+    plot.background_fill_color = "black"
+    plot.background_fill_alpha = 0.05
+
+    if df is not None:
+        print(df)
+        wells = [map_well_to_coords(n) for n in df.index]
+        x, y = zip(*wells)
+        x_empty, y_empty = zip(*product(range(1,25), range(1,17)))
+        plot.scatter(x, y, size=12, color="blue", alpha=0.5)
+        plot.scatter(x_empty, y_empty, size=10, color="black", alpha=0.1)
+        session['dataframe_pkg'] = (wells, request.form['reference_text'])
+
+    html = Markup(file_html(plot, CDN, "my plot"))
+
+    # need to also collect the plate that will be used, and update its status
+    plate_nominated = int(request.form['plate_id'].replace('Plate ID: ','').strip())
+    session['plate_nominated'] = plate_nominated
+
+    return render_template('order_seq.html',error=error,chart=html)
+
+
+@app.route('/commit_seq', methods=['POST'])
+def commit_seq():
+
+    wells, reference_text = session['dataframe_pkg']
+    plate_id = session['plate_nominated']
+
+    # add the sequencing order to the database
     db = get_db()
     db.execute(
-        '''insert into sequencing(owner, plate_map, status, issue, reference_text) values (?,?,?,?,?)''',
-        [g.user['user_id'], df.to_string(), 0, 0, request.form['reference_text'] ]
+        '''insert into sequencing(owner, map, status, issue, reference_text) values (?,?,?,?,?)''',
+        [g.user['id'], 'la', 0, 0, reference_text]
     )
     db.commit()
-    flash( 'Plate was sign_uped' )
+
+    # update plate status
+    update_status(plate_id, 2)
+
+    flash( 'Your order for sequencing {} samples was recieved'.format(len(wells)) )
+
     return redirect( url_for( 'index' ) )
 
+######################################################
+######################################################
+#################### admin dashboard #################
+######################################################
+######################################################
 
-#################### admin dashboard
+def update_status( plate_id, new_status ):
+    db = get_db()
+    db.execute('update plate set status = ? where id = ?', (new_status, plate_id))
+    db.commit()
 
-@app.route('/orders')
+def flag(plate_id):
+    db = get_db()
+    db.execute('update plate set issue = 1 where id = ?', (plate_id))
+    db.commit()
+
+result_pkg = {
+    'sequencing_id': 1,
+    'url': 'http://google.com',
+    'heatmap_data': [ 0.1, 0.2, 0.3 ],
+}
+
+def update_url( result_pkg ):
+    db = get_db()
+    db.execute('update sequencing set url = ? where id = ?', (result_pkg['url'], result_pkg['sequencing_id']))
+    db.commit()
+
+@app.route('/orders', methods=['POST', 'GET'])
 def orders():
-    plates = query_db('select * from plate')
-    sequencing = query_db('select * from sequencing')
-    users = query_db('select * from user')
-    return render_template( 'orders.html', plates=plates, sequencing=sequencing, users=users )
+    if request.method == 'POST':
+        # we are updating something
+        # but what?
+
+        if request.form['form_tag'] == 'add_users':
+            for n in range(25):
+                un = 'user_{}@email.com'.format(int(random.random()*1e4))
+                pw_hash = generate_password_hash('password')
+                ex_str = 'insert into user (email,date_joined,pw_hash) values (?,?,?)'
+                ex_iter = [un,datetime.now(),pw_hash]
+                db = get_db()
+                db.execute(ex_str, ex_iter)
+                db.commit()
+            print('Added 25 new users with {} new plates and {} new sequencing orders')
+
+        elif request.form['form_tag'] == 'advance':
+            pt_id = request.form['plate_id']
+            update_status(pt_id, request.form['new_status'])
+
+        elif request.form['form_tag'] == 'flag':
+            pt_id = request.form['plate_id']
+            flag(pt_id)
+
+        return redirect( url_for( 'orders') )
+
+    else:
+        plates = query_db('select * from plate')
+        sequencing = query_db('select * from sequencing')
+        users = query_db('select * from user')
 
 
-def html_status_codes( status_code ):
-    st_code = str(status_code)
-    codes = [
-        ('0','●<span style="color:#aaa">●●●</span> <small>Order placed</small>'),
-        ('1','<span style="color:#aaa">●</span>●<span style="color:#aaa;">●●</span> <small>Order placed</small>'),
-        ('',''),
-        ('',''),
-    ]
-    codes = dict(codes)
-    if st_code in codes.keys():
-        return Markup(codes[ st_code ])
+        #users is a list of dicts. let's update it a bit
+        us = []
+        for k in users:
+            new_u = { 'id': k['id'], 'email': k['email'], 'date_joined': k['date_joined'], }
+            plates = query_db('select * from plate where owner = ?', (new_u['id'],))
+            seq = query_db('select * from sequencing where owner = ?', (new_u['id'],))
+            us.append(new_u)
+            new_u.update({'n_plates':len(plates)})
+            new_u.update({'n_seq':len(seq)})
+
+        return render_template( 'orders.html', plates=plates, sequencing=sequencing, users=us )
 
 
+@app.route('/account', methods=['POST', 'GET'])
+def account():
+    '''
+    For managing user accounts.
+
+    Should only need to be one page.
+    '''
+
+    if request.method == 'POST':
+        # we are changing some thing in the form!
+        pass
+
+    # else, is get request
+    return render_template('account.html')
+
+######################################################
+######################################################
 # add some filters to jinja
 app.jinja_env.filters['datetimeformat'] = format_datetime
 app.jinja_env.filters['status'] = html_status_codes
+app.jinja_env.filters['status_human'] = html_status_codes_human

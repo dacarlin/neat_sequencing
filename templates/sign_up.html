@@ -2,26 +2,67 @@
 {% block title %}Neat Sequencing: Sign Up{% endblock %}
 {% block body %}
 <div class="container">
-  <div class="sign_in_panel">
-    <h3>Sign up for Neat account</h3>
-    {% if error %}
-    <div class="error alert-warning">
-      <!-- <strong>Error:</strong> -->
-      {{ error }}
+
+  <style>
+
+  h1 {
+    font-weight: normal;
+    text-align: center;
+    margin: 3rem;
+  }
+
+  </style>
+
+  <h1>Create your Neat account</h1>
+
+  <div class="row">
+
+    <div class="col-6 sign_in_info">
+
+      <img src="http://stuartluce.com/wp-content/uploads/2015/06/Growing-Plants.jpg"/>
+
     </div>
-    {% endif %}
-    <form action="" method="post">
-      <div class="form-group">
-        <label for="email">What’s your email?</label>
-        <input type="email" name="email" class="form-control" id="email" placeholder="Enter email">
-        <!-- <small class="form-text text-muted">We'll never share your email with anyone else.</small> -->
+
+    <div class="col-6 sign_in_form">
+
+      {% if error %}
+      <div class="error alert-warning">
+        <!-- <strong>Error:</strong> -->
+        {{ error }}
       </div>
-      <div class="form-group">
-        <label for="password">Choose a password</label>
-        <input type="password" class="form-control" name="password" id="password" placeholder="Password">
-      </div>
-      <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
-  </div>
+      {% endif %}
+      <form action="" method="post">
+
+        <!-- <div class="form-group row">
+          <label for="inputPassword3" class="col-sm-4 col-form-label">Name </label>
+          <div class="col-sm-4">
+            <input type="password1" class="form-control" id="inputPassword1" placeholder="First">
+          </div>
+          <div class="col-sm-4">
+            <input type="password2" class="form-control" id="inputPassword2" placeholder="Last">
+          </div>
+        </div> -->
+
+
+
+
+        <div class="form-group">
+          <label for="email">What&rsquo;s your email?</label>
+          <input type="email" name="email" class="form-control" id="email" placeholder="Email">
+          <small class="form-text text-muted">Your email address is also your user name</small>
+        </div>
+        <div class="form-group">
+          <label for="password">Choose a password</label>
+          <input type="password" class="form-control" name="password" id="password" placeholder="Password">
+          <small class="form-text text-muted">You will be signed in automatically</small>
+        </div>
+
+
+
+        <button type="submit" class="btn btn-primary">Continue to Neat</button>
+      </form>
+
+    </div>
+
 </div>
 {% endblock %}

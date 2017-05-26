@@ -30,6 +30,7 @@ create table sequencing (
   map text not null,
   reference_text text,
   date_ordered date,
+  plate_map text,
   status integer,
   issue integer
 );

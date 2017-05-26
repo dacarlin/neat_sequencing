@@ -23,49 +23,17 @@
     <script src='/static/nprogress.js'></script>
     <link rel='stylesheet' href='/static/nprogress.css'/>
   </head>
-
   <body>
-
-    <div class="flashes">
-    {% with flashes = get_flashed_messages() %}
-      {% if flashes %}
-        <ul class="flashes">
-        {% for message in flashes %}
-          <li>{{ message }}</li>
-        {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
-    </div>
-
-    <!-- navigation -->
-    <nav class="navbar navbar-light bg-faded">
-      <a class="navbar-brand" href="#">Neat Sequencing</a>
-    </nav>
-
-
-
     <div class="container">
-      <div class="header clearfix">
-
-        {% if g.user %}
-        {% else %}
-        {% endif %}
-
-      </div>
-
       <div class="body">
       {% block body %}{% endblock %}
       </div>
-
       <footer class="footer">
         <a href="/">neatseq.com</a> | <strong><a href="/sign_in">Sign in</a></strong> or <strong><a href="/sign_up">Sign up</a></strong> | Need help? Email us <strong><a>service@neatseq.com</a></strong>
       </footer>
-
     </div> <!-- /container -->
-
-    <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script> -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script> -->
+    <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script> -->
   </body>
 </html>

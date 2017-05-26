@@ -3,24 +3,26 @@
 {% block body %}
   <div class="container">
     <div class="sign_in_panel">
-      <h3>Confirm sequencing order</h3>
+      <h3>One more step …</h3>
       {% if error %}
       <div class="error alert-warning">
         <strong>⚠️ Error:</strong>
         {{ error }}
       </div>
       {% endif %}
-      <p class="lead">Does this look right?</p>
+      <p>Can you confirm that this plate layout matches your samples? </p>
       <div class="plate_chart">
       {{chart}}
       </div>
       <form action="/commit_seq" method="post">
-      <div class="form-group">
+      <!-- <div class="form-group">
         <label for="promo">Promo code</label>
         <input type="text" id="promo" name="promo" class="form-control" placeholder="Enter promo code">
         <small class="form-text text-muted">Enter a promo code if you have one</small>
+      </div> -->
+      <div class="pull-right text-right">
+        <button type="submit" class=" pull-right btn btn-primary">Confirm</button>
       </div>
-      <button type="submit" class="btn btn-primary">Submit</button>
     </form>
   </div>
 </div>
