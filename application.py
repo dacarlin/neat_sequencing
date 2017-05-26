@@ -24,7 +24,7 @@ PER_PAGE = 1000
 DEBUG = True
 SECRET_KEY = 'secret key!'
 
-app = Flask( __name__ )
+application = app = Flask( __name__ )
 app.config.from_object( __name__ )
 
 ######################################################
