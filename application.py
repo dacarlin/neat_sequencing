@@ -1,4 +1,4 @@
-from flask import Flask, request, session, url_for, redirect, render_template, abort, g, flash, _app_ctx_stack, Markup
+from flask import Flask, request, session, url_for, redirect, render_template, abort, g, flash, Markup
 from werkzeug import check_password_hash, generate_password_hash
 import pandas
 from bokeh.plotting import figure
@@ -19,18 +19,27 @@ from display import html_status_codes, html_status_codes_human
 # this for debug only
 # need to find good settigns for deploy
 
-DATABASE = 'neat.db'
+application = app = Flask( __name__ )
+app.config.from_object( __name__ )
+
 PER_PAGE = 1000
 DEBUG = True
 SECRET_KEY = 'secret key!'
-
-application = app = Flask( __name__ )
-app.config.from_object( __name__ )
 
 ######################################################
 ######################################################
 # database connections
 # basically taken from flask example
+
+from flask import _app_ctx_stack
+from flask_sqlalchemy import SQLAlchemy
+
+call = 'mysql://{master_username}:{db_password}@{endpoint}/{db_instance_name}'
+endpoint = 'demo2.ckzdltzbwwbp.us-east-1.rds.amazonaws.com:3306'
+application.config['SQLALCHEMY_DATABASE_URI'] = call.format(master_username='awsuser', db_password='mypassword', endpoint=endpoint, db_instance_name='my_db')
+DATABASE = SQLAlchemy(application)
+
+print(type(DATABASE), DATABASE )
 
 def get_db():
     """Opens a new database connection if there is none yet for the
@@ -39,7 +48,8 @@ def get_db():
     # what is application context?
     top = _app_ctx_stack.top
     if not hasattr(top, 'sqlite_db'):
-        top.sqlite_db = sqlite3.connect(app.config['DATABASE'])
+        #top.sqlite_db = sqlite3.connect(app.config['DATABASE'])
+        top.sqlite_db = DATABASE
         top.sqlite_db.row_factory = sqlite3.Row
     return top.sqlite_db
 
@@ -312,6 +322,17 @@ def update_url( result_pkg ):
     db.execute('update sequencing set url = ? where id = ?', (result_pkg['url'], result_pkg['sequencing_id']))
     db.commit()
 
+
+
+
+
+# plate detail view
+@app.route('/plate/<plate_id>')
+def plate_detail(plate_id):
+    return plate_id
+
+
+
 @app.route('/orders', methods=['POST', 'GET'])
 def orders():
     if request.method == 'POST':
@@ -344,18 +365,24 @@ def orders():
         sequencing = query_db('select * from sequencing')
         users = query_db('select * from user')
 
+        for user in users:
+            user = dict(user)
+            my_plates = query_db('select * from plate where owner = ?', (user['id'],))
+            my_seq = query_db('select * from sequencing where owner = ?', (user['id'],))
+            update_pkg = dict(zip(['n_plates', 'n_seq'], [len(my_plates), len(my_seq)]))
+            user.update(update_pkg)
 
         #users is a list of dicts. let's update it a bit
-        us = []
-        for k in users:
-            new_u = { 'id': k['id'], 'email': k['email'], 'date_joined': k['date_joined'], }
-            plates = query_db('select * from plate where owner = ?', (new_u['id'],))
-            seq = query_db('select * from sequencing where owner = ?', (new_u['id'],))
-            us.append(new_u)
-            new_u.update({'n_plates':len(plates)})
-            new_u.update({'n_seq':len(seq)})
+        # users = []
+        # for k in users:
+        #     new_u = { 'id': k['id'], 'email': k['email'], 'date_joined': k['date_joined'], }
+        #     u_plates = query_db('select * from plate where owner = ?', (new_u['id'],))
+        #     seq = query_db('select * from sequencing where owner = ?', (new_u['id'],))
+        #     us.append(new_u)
+        #     new_u.update({'n_plates':len(plates)})
+        #     new_u.update({'n_seq':len(seq)})
 
-        return render_template( 'orders.html', plates=plates, sequencing=sequencing, users=us )
+        return render_template( 'orders.html', plates=plates, sequencing=sequencing, users=users )
 
 
 @app.route('/account', methods=['POST', 'GET'])

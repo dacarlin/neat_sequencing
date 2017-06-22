@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Neat Admin Dashboard</title>
+    <meta charset="utf-8">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Sans"/>
+    <link rel="stylesheet" href="/static/style.css"/>
+    <script src='/static/nprogress.js'></script>
+    <link rel='stylesheet' href='/static/nprogress.css'/>
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.css">
+    <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.js"></script>
+  </head>
+  <body>
+    <div class="container">
+
+      <h1>Plate #{{pt.id}}</h1>
+
+      <table>
+          <tr>
+            <th>Plate ID</th>
+            <th>Physical ID</th>
+            <th>Owner</th>
+            <th>Status</th>
+            <th>Issue</th>
+            <th>Date Ordered</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ pt.id }}</td>
+            <td>{{ pt.physical }}</td>
+            <td>{{ pt.owner }}</td>
+            <td>{{ pt.status }}</td>
+            <td>{{ pt.issue }}</td>
+            <td>{{ pt.date_ordered }}</td>
+            <td></td>
+
+          </tr>
+        </tbody>
+      </table>
+
+  <div class="btn-group">
+    <form method='post' action='' class="form-inline btn">
+      <input hidden type="text" name="form_tag" value="advance"/>
+      <input type="text" name="new_status" hidden value="{{pt.status + 1}}" />
+      <input type="text" name="plate_id" hidden value="{{pt.id}}" />
+      <button type="submit" class="btn btn-primary btn-sm">Advance status</button>
+    </form>
+
+    <form method='post' action='' class="form-inline btn">
+      <input hidden type="text" name="form_tag" value="flag"/>
+      <input type="text" name="new_status" hidden value="{{pt.status}}" />
+      <input type="text" name="plate_id" hidden value="{{pt.id}}" />
+      <button type="submit" class="btn btn-warning btn-sm">Flag</button>
+    </form>
+
+    <form method='post' action='' class="form-inline btn">
+      <input hidden type="text" name="form_tag" value="delete"/>
+      <input type="text" name="new_status" hidden value="-1" />
+      <input type="text" name="plate_id" hidden value="{{pt.id}}" />
+      <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+    </form>
+  </div>
+
+</div>
+
+
+
+    <script>
+      NProgress.start();
+
+      $(document).ready( function () {
+          $('#user_table').DataTable();
+          $('#plate_table').DataTable();
+      } );
+
+      NProgress.done();
+    </script>
+  </body>
+</html>

@@ -27,7 +27,7 @@
 
       <!-- users DataTables table -->
       <h1>Users ({{users|length}} total)</h1>
-      <table id="table_id" class="display">
+      <table id="user_table" class="display">
         <thead>
           <tr>
             <th>User ID</th>
@@ -51,87 +51,59 @@
       </table>
       <hr>
 
-      <!-- plates on order -->
-      <div class="admin plates table">
-        <h1>Plates ({{plates|length}} total)</h1>
-        <div class="row">
-          {% for plate in plates %}
-          <div class="col-2">
-            <p><strong>{{plate.id}}</strong></p>
-          </div>
-          <div class="col-2">
-            <p>{{plate.owner}} (user ID)</p>
-          </div>
-          <div class="col-2">
-            <p>{{plate.status|status}}, {{ plate.issue }}</p>
-          </div>
-          <div class="col-6 actions admin">
-            <form method='post' action='' class="form-inline btn">
-              <input hidden type="text" name="form_tag" value="advance"/>
-              <input type="text" name="new_status" hidden value="{{plate.status + 1}}" />
-              <input type="text" name="plate_id" hidden value="{{plate.id}}" />
-              <button type="submit" class="btn btn-primary btn-sm">Advance status</button>
-            </form>
-            <form method='post' action='' class="form-inline btn">
-              <input hidden type="text" name="form_tag" value="flag"/>
-              <input type="text" name="new_status" hidden value="{{plate.status}}" />
-              <input type="text" name="plate_id" hidden value="{{plate.id}}" />
-              <button type="submit" class="btn btn-warning btn-sm">Flag</button>
-            </form>
-            <form method='post' action='' class="form-inline btn">
-              <input hidden type="text" name="form_tag" value="delete"/>
-              <input type="text" name="new_status" hidden value="-1" />
-              <input type="text" name="plate_id" hidden value="{{plate.id}}" />
-              <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-            </form>
-          </div>
-          {% else %}
-          <div class="col-12">
-            No plates yet
-          </div>
+      <!-- plates DataTables table -->
+      <h1>Plates ({{plates|length}} total)</h1>
+      <table id="plate_table" class="display">
+        <thead>
+          <tr>
+            <th>Plate ID</th>
+            <th>Physical ID</th>
+            <th>Owner</th>
+            <th>Status</th>
+            <th>Issue</th>
+            <th>Date Ordered</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for pt in plates %}
+          <tr>
+            <td>{{ pt.id }}</td>
+            <td>{{ pt.physical }}</td>
+            <td>{{ pt.owner }}</td>
+            <td>{{ pt.status }}</td>
+            <td>{{ pt.issue }}</td>
+            <td>{{ pt.date_ordered }}</td>
+            <td>
+              <div class="btn-group">
+                <form method='post' action='' class="form-inline btn">
+                  <input hidden type="text" name="form_tag" value="advance"/>
+                  <input type="text" name="new_status" hidden value="{{pt.status + 1}}" />
+                  <input type="text" name="plate_id" hidden value="{{pt.id}}" />
+                  <button type="submit" class="btn btn-primary btn-sm">Advance status</button>
+                </form>
+
+                <form method='post' action='' class="form-inline btn">
+                  <input hidden type="text" name="form_tag" value="flag"/>
+                  <input type="text" name="new_status" hidden value="{{pt.status}}" />
+                  <input type="text" name="plate_id" hidden value="{{pt.id}}" />
+                  <button type="submit" class="btn btn-warning btn-sm">Flag</button>
+                </form>
+
+                <form method='post' action='' class="form-inline btn">
+                  <input hidden type="text" name="form_tag" value="delete"/>
+                  <input type="text" name="new_status" hidden value="-1" />
+                  <input type="text" name="plate_id" hidden value="{{pt.id}}" />
+                  <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+              </div>
+            </td>
+          </tr>
           {% endfor %}
-        </div>
-        <hr>
+        </tbody>
+      </table>
 
-        <!-- sequencing orders -->
-        <h1>Sequencing orders</h1>
-        <div class="row">
-        {% for s in sequencing %}
-          <div class="col-2">
-            <p>{{s.id}}</p>
-          </div>
-          <div class="col-2">
-            <p>{{s.issue}} (issue)</p>
-          </div>
-          <div class="col-2">
-            <p>{{ s.status|status }} </p>
-          </div>
-          <div class="col-2">
-            <p>{{s.owner}} (owner)</p>
-          </div>
-          <div class="col-1">
-            <p>{{s.map[0:9]}}</p>
-          </div>
-          <div class="col-1">
-            <p>{{s.reference_text}}</p>
-          </div>
-          <div class="col-2 admin actions">
-            <a href="" class="btn btn-sm btn-primary">Mark done</a>
-          </div>
-          <!-- sequencing_id integer primary key autoincrement,
-          plate_map text not null,
-          reference_text text,
-          date_ordered integer,
-          status integer,
-          issue integer,
-          owner integer,
-          foreign key (owner) references user(user_id) -->
-        {% endfor %}
-        </div>
-      </div>
-      <hr>
-      <hr>
-
+      
       <div class="dangerous">
         <h1>Dangerous</h1>
 
@@ -148,7 +120,8 @@
       NProgress.start();
 
       $(document).ready( function () {
-          $('#table_id').DataTable();
+          $('#user_table').DataTable();
+          $('#plate_table').DataTable();
       } );
 
       NProgress.done();
