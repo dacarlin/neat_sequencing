@@ -49,3 +49,49 @@ First, we do AMPure DNA cleanup. Next, SMRTbell template preparation for amplico
 -Optimal loading concentration 37% ZMW
 -Load time is 30 minutes
 -Plates are held at 4 ˚C until we have enough to continue
+
+Run 10 hour movie on Sequel. For analysis, run both `CCS` and `LAA` pipelines. Unfortunately, the PacBio AMI is out of date, but it is relatively simple to launch EC2 instances 
+
+### How to install PacBio SMRTLink on an AWS instance 
+
+#### Launch and config an EC2 instance 
+
+m3.2xlarge (8 CPUs, X GB ram, 2 x 80GB SSD instance storage) 
+
+#### Copy your data files to the instance 
+
+```bash
+scp -r -i aws.pem data_files ec2-user@54.89.153.29:
+#ok to leave in the ec2-user home dir for now 
+```
+
+#### Install SMRTLink 
+
+First, download and unzip it 
+
+```bash
+curl -O https://downloads.pacbcloud.com/public/software/installers/smrtlink_4.0.0.190159.zip
+unzip -P SmrT3chN smrtlink_4.0.0.190159.zip
+```
+
+Now you can install it right here (doesn't matter where) 
+
+```bash
+smrtlink_4.0.0.190159.run --rootDir smrtlink 
+```
+
+You will need to provide all the options. Most (all?) can be left as default. 
+
+#### Run the consensus with barcoding 
+
+To run analysis, I simply create small Bash scripts like this 
+
+```
+#!/bin/bash
+
+SUBREADS=datafiles/5_E01/m54048_170422_091135.subreadset.xml
+BARCODES=barcodes.fa
+
+module load pb
+pbsmrtpipe pipeline-id pbsmrtpipe.pipelines.sa3_ds_barcode_ccs -e eid_subread:$SUBREADS -e eid_barcode:$BARCODES
+```
